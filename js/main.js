@@ -634,10 +634,28 @@
       return new Promise(function (res) { c.toBlob(res, "image/jpeg", 0.92); });
     });
   }
+  // 미리보기: 공유 섹션 근처에 오면 한 번 만들어 두고, 저장할 때도 그 이미지를 그대로 씀
+  var infoBlob = null, infoBuilding = null;
+  function getInfoImage() {
+    if (infoBlob) return Promise.resolve(infoBlob);
+    if (!infoBuilding) infoBuilding = buildInfoImage().then(function (b) { infoBlob = b; return b; });
+    return infoBuilding;
+  }
+  var pv = $("#infoPreview");
+  if ("IntersectionObserver" in window) {
+    var pio = new IntersectionObserver(function (es) {
+      if (!es[0].isIntersecting) return;
+      pio.disconnect();
+      getInfoImage().then(function (b) { pv.querySelector("img").src = URL.createObjectURL(b); pv.hidden = false; }).catch(function () {});
+    }, { rootMargin: "400px" });
+    pio.observe(pv.parentNode);
+  }
+  pv.addEventListener("click", function () { $("#shareImage").click(); });
+
   $("#shareImage").addEventListener("click", function () {
     var btn = this;
     btn.disabled = true;
-    buildInfoImage().then(function (blob) {
+    getInfoImage().then(function (blob) {
       var name = "wedding_" + Y + pad(M + 1) + pad(D) + ".jpg";
       var file = new File([blob], name, { type: "image/jpeg" });
       // 휴대폰: 공유창의 '이미지 저장'으로 앨범에 바로 저장 / PC: 파일 다운로드
