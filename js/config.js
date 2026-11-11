@@ -77,7 +77,7 @@ window.WEDDING = {
     ["Forever with", "Love & Happiness"],
   ],
   // 카카오톡 공유용 JavaScript 키 (README 참고). 비워 두면 휴대폰 기본 공유창이 열림(카톡 선택 가능)
-  kakaoKey: "",
+  kakaoKey: "def91d7e5bf41f8cfeca668c34dfddd7",
   // 갤러리 (테마별). 사진 = images/gallery/full/번호.jpg (크게 보기) + images/gallery/thumb/번호.jpg (격자)
   // 테마를 추가·삭제하거나 사진 순서를 바꾸려면 이 목록만 고치면 됩니다.
   // '전체' 칩은 각 테마에서 한 장씩 번갈아 섞어 보여 주고, 9장 넘으면 '펼치기' 버튼이 생김
