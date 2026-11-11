@@ -517,7 +517,10 @@
   // ── 계좌 ──
   $$(".acc-card").forEach(function (card) {
     var inner = el("div", "acc-inner");
-    W.accounts[card.dataset.side].forEach(function (a) {
+    // 아직 TEMP 인 계좌는 숨김 (번호를 채우면 자동으로 보임). 한 측이 전부 비면 그 카드도 숨김
+    var list = W.accounts[card.dataset.side].filter(function (a) { return a.bank && !/^TEMP/.test(a.bank) && a.number; });
+    if (!list.length) { card.hidden = true; return; }
+    list.forEach(function (a) {
       var r = el("div", "acc-row"), info = el("div", "acc-info");
       info.appendChild(el("p", "acc-who", a.role + " " + a.name));
       var num = el("p", "acc-num");
