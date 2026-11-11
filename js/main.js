@@ -600,7 +600,7 @@
     var accent = cs.getPropertyValue("--rose").trim() || "#8f735c";
     var bg = cs.getPropertyValue("--bg").trim() || "#fcfaf6";
     return Promise.all([
-      loadImg(W.cover),
+      loadImg(W.infoImage || W.cover),
       document.fonts.load("700 60px Eulyoo1945"), document.fonts.load("400 40px Eulyoo1945"), document.fonts.load("80px Parisienne"),
     ]).then(function (r) {
       var im = r[0], Wd = 1080, Ht = 1920, c = document.createElement("canvas");
@@ -610,7 +610,7 @@
       // 사진 (위쪽 1100px, 가운데 맞춰 자르기)
       var ph = 1200, s = Math.max(Wd / im.naturalWidth, ph / im.naturalHeight);
       var sw = Wd / s, sh = ph / s;
-      x.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) / 2.6, sw, sh, 0, 0, Wd, ph);
+      x.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) * 0.12, sw, sh, 0, 0, Wd, ph);
       // 사진 아래를 배경색으로 자연스럽게 (투명→배경색, 같은 색이라 회색 띠 없음)
       var hx = /^#?([0-9a-f]{6})$/i.exec(bg), rgb = hx ? [0, 2, 4].map(function (k) { return parseInt(hx[1].substr(k, 2), 16); }).join(",") : "252,250,246";
       var gr = x.createLinearGradient(0, ph - 300, 0, ph);

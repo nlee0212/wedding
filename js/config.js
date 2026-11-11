@@ -67,6 +67,7 @@ window.WEDDING = {
   cover: "images/gallery/full/13.jpg",
   petals: false, // 표지 위 떨어지는 꽃잎 효과
   closing: "images/gallery/full/33.jpg", // 엔딩 크레딧 배경 (어두운 사진이 잘 어울림)
+  infoImage: "images/gallery/full/22.jpg", // 예식 정보 이미지 저장에 쓰는 사진
   // 엔딩 크레딧 [왼쪽, 오른쪽]
   credits: [
     ["Produced by", "our family"],
@@ -89,7 +90,7 @@ window.WEDDING = {
 
   // 배경음악. mp3 파일을 audio/ 폴더에 넣고 경로를 적으세요. 비워 두면 음악 버튼 숨김
   bgm: "audio/bgm.m4a", // 결혼 초대곡 (Suno로 직접 만든 곡)
-  bgmCredit: "♪ 결혼 초대곡 · made with Suno", // 맨 아래 작게 표시할 곡 정보 (비우면 숨김)
+  bgmCredit: "", // 맨 아래 작게 표시할 곡 정보 (비우면 숨김)
 
   // Apps Script 웹앱 URL (README 참고) — 참석 여부(구글 시트)와 사진 올리기(구글 드라이브)에 같이 씀
   appsScriptUrl: "https://script.google.com/macros/s/AKfycbyXIOUzNGLI_ZTxBTctesmsJxxskBLSprFsz8IQ9ILPse_BAr3ACBMdqD1odCu2HuZz/exec",
