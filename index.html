@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>김용현 ♥ 이나연의 결혼식에 초대합니다</title>
+  <meta name="description" content="2027년 3월 7일 (일) 오후 2시 · 르비르모어 선릉 2F 클리타홀" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="김용현 ♥ 이나연의 결혼식에 초대합니다" />
+  <meta property="og:description" content="2027년 3월 7일 (일) 오후 2시 · 르비르모어 선릉 2F 클리타홀" />
+  <!-- 카톡·문자 링크 미리보기 (절대 주소여야 사진이 뜸). 표지 사진을 얼굴 기준 정사각형으로 자른 것 -->
+  <meta property="og:url" content="https://nlee0212.github.io/wedding/" />
+  <meta property="og:image" content="https://nlee0212.github.io/wedding/images/gallery/thumb/13.jpg" />
+  <meta property="og:image:width" content="640" />
+  <meta property="og:image:height" content="640" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Parisienne&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=20261112f" />
+</head>
+<body>
+<main class="page">
+
+  <!-- 표지 -->
+  <section class="cover" id="cover">
+    <img class="cover-img" id="coverImg" alt="신랑 신부 사진" />
+    <div class="cover-shade"></div>
+    <div class="petals" aria-hidden="true"></div>
+    <p class="cover-names-ko"><span data-f="groom.name"></span><i>&amp;</i><span data-f="bride.name"></span></p>
+    <div class="cover-bottom">
+      <p class="cover-script"><span data-f="groom.en"></span> &amp; <span data-f="bride.en"></span></p>
+      <p class="cover-date" data-f="dateKo"></p>
+      <p class="cover-venue"><span data-f="venue.name"></span> <span data-f="venue.hall"></span></p>
+    </div>
+    <div class="scroll-hint" aria-hidden="true"></div>
+  </section>
+
+  <!-- 초대 글 -->
+  <section class="sec reveal" id="letter">
+    <svg class="ornament" viewBox="0 0 160 30" aria-hidden="true"><path d="M80 15c-14 0-22-9-38-9-10 0-18 5-24 11M80 15c14 0 22-9 38-9 10 0 18 5 24 11M30 9c-3-5-9-6-12-4 4 1 7 4 12 4zm14-4c-1-5-6-7-10-6 3 2 5 5 10 6zm86 4c3-5 9-6 12-4-4 1-7 4-12 4zm-14-4c1-5 6-7 10-6-3 2-5 5-10 6zM80 15c-3-4-3-8 0-11 3 3 3 7 0 11z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+    <p class="big-date" data-f="dateDot"></p>
+    <p class="rose-sub">두 사람의 결혼식에 초대합니다.</p>
+    <h2 class="spaced">INVITATION</h2>
+    <div class="greeting" id="greeting"></div>
+    <div class="parents">
+      <p><span data-f="groom.father"></span><b>•</b><span data-f="groom.mother"></span><em>의 <span data-f="groom.relation"></span></em><strong data-f="groom.first"></strong></p>
+      <p><span data-f="bride.father"></span><b>•</b><span data-f="bride.mother"></span><em>의 <span data-f="bride.relation"></span></em><strong data-f="bride.first"></strong></p>
+    </div>
+  </section>
+
+  <!-- 달력 -->
+  <section class="sec reveal" id="calendar">
+    <p class="cal-head" data-f="dateKoFull"></p>
+    <p class="cal-head-en" data-f="dateEn"></p>
+    <table class="cal" id="cal" aria-label="예식 달력"></table>
+    <div class="countdown">
+      <div><small>DAYS</small><b id="cdD">0</b></div><span>:</span>
+      <div><small>HOUR</small><b id="cdH">0</b></div><span>:</span>
+      <div><small>MIN</small><b id="cdM">0</b></div><span>:</span>
+      <div><small>SEC</small><b id="cdS">0</b></div>
+    </div>
+    <p class="dday-text" id="ddayText"></p>
+    <a class="pill grad" id="gcal" target="_blank" rel="noopener">＋ Google Calendar에 추가</a>
+  </section>
+
+  <!-- 갤러리 -->
+  <section class="sec reveal" id="gallerySec">
+    <p class="eyebrow">GALLERY</p>
+    <div class="chips" id="galleryChips" role="group" aria-label="사진 테마"></div>
+    <p class="gallery-hint">사진을 눌러 <span class="hint-heart">♥</span> 하트와 댓글을 남겨 주세요</p>
+    <div class="gallery" id="gallery"></div>
+    <button class="pill outline" id="galleryMore" type="button" hidden>⌄ 펼치기</button>
+  </section>
+
+  <!-- 오시는 길 + 안내 -->
+  <section class="sec reveal" id="location">
+    <p class="eyebrow">INFORMATION</p>
+    <h2 class="title">예식 정보 및 안내 사항</h2>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="way" aria-selected="true">오시는 길</button>
+      <button type="button" role="tab" data-tab="meal" aria-selected="false">식사 안내</button>
+    </div>
+
+    <div class="tab-panel" data-panel="way">
+      <p class="loc-addr"><span data-f="venue.address"></span> <button class="mini" id="copyAddr" type="button">복사</button></p>
+      <div class="way-card">
+        <div class="way-rows" id="wayRows"></div>
+        <div class="way-foot">
+          <p><span data-f="venue.name"></span> <span data-f="venue.hall"></span></p>
+          <p class="way-tel" id="wayTel">Tel <a id="telLink" data-f="venue.tel"></a></p>
+        </div>
+        <div class="map-btns">
+          <a id="mapNaver" class="map-btn"><i class="mi naver">N</i>네이버 지도</a>
+          <a id="mapKakao" class="map-btn"><i class="mi kakao">K</i>카카오맵</a>
+          <a id="mapTmap" class="map-btn"><i class="mi tmap">T</i>티맵</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel="meal" hidden>
+      <div class="tab-body" id="mealBody"></div>
+    </div>
+  </section>
+
+  <!-- 참석 여부 -->
+  <section class="sec reveal" id="rsvpSec">
+    <p class="eyebrow">R.S.V.P.</p>
+    <h2 class="title">참석 의사 전달</h2>
+    <p class="desc">축하의 마음으로 참석해 주시는 모든 분들을<br />더욱 귀하게 모실 수 있도록<br />참석 여부를 미리 알려 주시면 감사하겠습니다.</p>
+    <button class="pill solid" id="rsvpOpen" type="button">참석 의사 전달하기</button>
+  </section>
+
+  <!-- 계좌 -->
+  <section class="sec reveal" id="account">
+    <p class="eyebrow">ACCOUNT</p>
+    <h2 class="title">마음 전하기</h2>
+    <p class="desc">참석이 어려우신 분들을 위해<br />계좌번호를 기재하였습니다. 너그러운 양해 부탁드립니다.</p>
+    <div class="acc-card" data-side="groom"><button class="acc-head" type="button" aria-expanded="false">신랑 측 계좌번호</button><div class="acc-body"></div></div>
+    <div class="acc-card" data-side="bride"><button class="acc-head" type="button" aria-expanded="false">신부 측 계좌번호</button><div class="acc-body"></div></div>
+  </section>
+
+  <!-- 방명록 (말풍선, 구글 시트 '방명록' 탭에 저장) -->
+  <section class="sec reveal" id="guestbookSec" hidden>
+    <p class="eyebrow">GUESTBOOK</p>
+    <div class="gb-dove" aria-hidden="true">🕊️</div>
+    <p class="gb-pill">신랑신부에게 축하 메시지를 남겨 주세요 ♡</p>
+    <form class="gb-form" id="gbForm" novalidate>
+      <div class="gb-row">
+        <input name="gbname" maxlength="10" placeholder="이름" autocomplete="name" />
+        <input name="gbpw" type="password" maxlength="20" placeholder="비밀번호 (4자 이상)" autocomplete="new-password" />
+      </div>
+      <input name="gbmsg" maxlength="40" placeholder="Message… (40자 이내, 이모지 가능)" />
+      <p class="gb-count"><span id="gbLeft">40</span>자 남음</p>
+      <p class="form-err" id="gbErr" role="alert"></p>
+      <button class="gb-submit" type="submit">💬 메시지 등록</button>
+    </form>
+    <ul class="gb-list" id="gbList"></ul>
+    <button class="pill outline" id="gbMore" type="button" hidden>더 보기</button>
+  </section>
+
+  <!-- 사진 공유 -->
+  <section class="sec reveal" id="snapSec" hidden>
+    <p class="eyebrow">CAPTURE OUR MOMENTS</p>
+    <h2 class="title">Snaps</h2>
+    <p class="desc dark">신랑신부의 행복한 순간을 담아 주세요.<br />아래 버튼으로 사진을 올리실 수 있어요.<br />많은 참여 부탁드려요!</p>
+    <button class="pill white" id="snapBtn" type="button">사진 올리기</button>
+    <input type="file" id="snapInput" accept="image/*" multiple hidden />
+    <p class="desc small">오늘 찍어 주신 신랑 신부의 모습을<br />여기서 바로 공유하실 수 있습니다!</p>
+  </section>
+
+  <!-- 마무리 -->
+  <!-- 엔딩 크레딧 -->
+  <section class="credits" id="credits">
+    <img class="credits-bg" id="closingImg" alt="" />
+    <div class="credits-shade"></div>
+    <dl class="credits-roll" id="creditsRoll"></dl>
+    <div class="credits-end">
+      <p class="credits-thanks">저희의 새로운 시작을<br />함께해 주셔서 감사합니다.</p>
+      <p class="credits-script">The End &amp; Our Beginning</p>
+    </div>
+  </section>
+
+  <!-- 공유 -->
+  <section class="sec share reveal">
+    <button class="share-btn" id="shareKakao" type="button"><svg viewBox="0 0 24 24"><path d="M12 4C7 4 3 7.1 3 11c0 2.5 1.7 4.7 4.2 5.9l-.8 3.1 3.6-2.4c.7.1 1.3.2 2 .2 5 0 9-3.1 9-7s-4-7-9-7z" fill="currentColor"/></svg>카카오톡으로 공유</button>
+    <button class="share-btn" id="shareLink" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg>링크 복사</button>
+    <button class="share-btn" id="shareImage" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 16l-5-5-8 8.5"/></svg>예식 정보 이미지 저장</button>
+    <p class="desc small">예식 정보를 사진 한 장으로 저장해<br />앨범에서 간편히 확인해 보세요!</p>
+  </section>
+  <footer class="foot"><p class="foot-script"><span data-f="groom.en"></span> &amp; <span data-f="bride.en"></span></p><p data-f="dateDotSpaced"></p><p class="foot-music" data-f="bgmCredit"></p></footer>
+</main>
+
+<!-- 음악 -->
+<button class="bgm-btn" id="bgmBtn" type="button" aria-label="배경음악 켜기/끄기" hidden>
+  <svg viewBox="0 0 24 24" class="ic-on"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 010 7M18.5 6a8.5 8.5 0 010 12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+  <svg viewBox="0 0 24 24" class="ic-off"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16.5 9.5l5 5m0-5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+</button>
+<audio id="bgm" loop preload="auto"></audio>
+<div class="bgm-banner" id="bgmBanner" role="status">배경음악이 재생됩니다 · 오른쪽 위 버튼으로 끌 수 있어요</div>
+
+<!-- 참석 여부 팝업 -->
+<div class="modal" id="rsvpModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="rsvpTitle">
+    <button class="modal-x" type="button" data-close aria-label="닫기">×</button>
+    <h3 id="rsvpTitle">참석 의사 전달</h3>
+    <p class="modal-desc">신랑 신부에게 참석 여부를 알려 주세요.</p>
+    <form id="rsvpForm" novalidate>
+      <div class="field">
+        <span class="label">어느 측 하객이신가요?</span>
+        <div class="seg"><label><input type="radio" name="side" value="신랑측" required /><span>신랑측</span></label><label><input type="radio" name="side" value="신부측" /><span>신부측</span></label></div>
+      </div>
+      <div class="field">
+        <span class="label">참석 여부</span>
+        <div class="seg"><label><input type="radio" name="attend" value="참석" required /><span>참석할게요</span></label><label><input type="radio" name="attend" value="불참" /><span>마음만 전할게요</span></label></div>
+      </div>
+      <div class="field">
+        <label class="label" for="rsvpName">성함</label>
+        <input id="rsvpName" name="name" maxlength="20" placeholder="성함을 입력해 주세요" required />
+      </div>
+      <div class="field" data-when-attend>
+        <span class="label">참석 인원 <small>(본인 포함)</small></span>
+        <div class="stepper"><button type="button" data-step="-1" aria-label="인원 줄이기">−</button><output id="rsvpCount">1</output><button type="button" data-step="1" aria-label="인원 늘리기">＋</button></div>
+      </div>
+      <div class="field" data-when-attend>
+        <span class="label">식사 여부</span>
+        <div class="seg three"><label><input type="radio" name="meal" value="예정" /><span>예정</span></label><label><input type="radio" name="meal" value="안 함" /><span>안 함</span></label><label><input type="radio" name="meal" value="미정" /><span>미정</span></label></div>
+      </div>
+      <div class="field">
+        <label class="label" for="rsvpPhone">연락처 <small>(선택)</small></label>
+        <input id="rsvpPhone" name="phone" inputmode="tel" maxlength="20" placeholder="010-0000-0000" />
+      </div>
+      <div class="field">
+        <label class="label" for="rsvpMsg">전하실 말씀 <small>(선택)</small></label>
+        <textarea id="rsvpMsg" name="message" rows="2" maxlength="200" placeholder="신랑 신부에게 한마디"></textarea>
+      </div>
+      <p class="form-err" id="rsvpErr" role="alert"></p>
+      <button class="modal-submit" type="submit">전달하기</button>
+    </form>
+    <button class="modal-later" type="button" id="rsvpLater">오늘 하루 보지 않기</button>
+  </div>
+</div>
+
+<!-- 사진 올리기 팝업 -->
+<div class="modal" id="snapModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="snapTitle">
+    <button class="modal-x" type="button" data-close aria-label="닫기">×</button>
+    <h3 id="snapTitle">사진 올리기</h3>
+    <p class="modal-desc" id="snapCountText"></p>
+    <div class="snap-grid" id="snapGrid"></div>
+    <button class="snap-add" id="snapAdd" type="button">＋ 사진 더 고르기</button>
+    <div class="field">
+      <label class="label" for="snapName">올리시는 분 <small>(선택)</small></label>
+      <input id="snapName" maxlength="20" placeholder="성함" />
+    </div>
+    <div class="progress" id="snapProgress" hidden><span></span></div>
+    <p class="form-err" id="snapErr" role="alert"></p>
+    <button class="modal-submit" id="snapSend" type="button">올리기</button>
+  </div>
+</div>
+
+<!-- 사진 피드 (사진을 누르면 열림) -->
+<div class="feed" id="feed" hidden>
+  <div class="feed-bar">
+    <button id="feedBack" type="button" aria-label="갤러리로 돌아가기">‹</button>
+    <span>Gallery</span>
+  </div>
+  <div id="feedList"></div>
+</div>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lb-close" type="button" aria-label="닫기">×</button>
+  <button class="lb-prev" type="button" aria-label="이전">‹</button>
+  <img alt="" />
+  <button class="lb-next" type="button" aria-label="다음">›</button>
+  <p class="lb-count" id="lbCount"></p>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="js/config.js?v=20261112f"></script>
+<script src="js/main.js?v=20261112f"></script>
+</body>
+</html>
