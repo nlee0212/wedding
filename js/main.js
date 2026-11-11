@@ -114,7 +114,7 @@
     txt.textContent = "";
     if (diff <= 0) {
       ["#cdD", "#cdH", "#cdM", "#cdS"].forEach(function (s) { $(s).textContent = "0"; });
-      txt.textContent = W.groom.first + " ♥ " + W.bride.first + "의 결혼식에 함께해 주셔서 감사합니다";
+      txt.textContent = W.groom.first + " & " + W.bride.first + "의 결혼식에 함께해 주셔서 감사합니다";
       return;
     }
     var s = Math.floor(diff / 1000);
@@ -122,7 +122,7 @@
     $("#cdH").textContent = Math.floor(s / 3600) % 24;
     $("#cdM").textContent = Math.floor(s / 60) % 60;
     $("#cdS").textContent = s % 60;
-    txt.append(W.groom.first + " ♥ " + W.bride.first + "의 결혼식이 ");
+    txt.append(W.groom.first + " & " + W.bride.first + "의 결혼식이 ");
     txt.appendChild(el("em", null, Math.ceil(diff / 86400000) + "일"));
     txt.append(" 남았습니다");
   }
@@ -557,7 +557,7 @@
 
   // ── 공유: 카카오톡 / 링크 복사 / 예식 정보 이미지 ──
   var shareUrl = location.href.split(/[?#]/)[0];
-  var shareTitle = W.groom.name + " ♥ " + W.bride.name + " 결혼합니다";
+  var shareTitle = W.groom.name + " & " + W.bride.name + " 결혼합니다";
   var shareText = W.dateKo + "\n" + v.name + " " + v.hall;
   function absUrl(p) { return new URL(p, shareUrl).href; }
   function loadKakao() {
