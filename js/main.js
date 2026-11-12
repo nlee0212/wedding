@@ -758,8 +758,10 @@
   // 막히면 하객이 화면을 처음 터치하는 순간(참석 팝업 등) 재생을 시작한다.
   var audio = $("#bgm"), bgmBtn = $("#bgmBtn"), userMuted = false;
   var bannerShown = false;
+  var bgmHint = $("#bgmHint");
   function setPlaying(on) {
     bgmBtn.classList.toggle("playing", on);
+    if (on) bgmHint.hidden = true;
     // 처음 재생될 때 한 번만 위쪽에 안내 띠를 보여 줌
     if (on && !bannerShown) {
       bannerShown = true;
@@ -790,12 +792,22 @@
     audio.addEventListener("play", function () { setPlaying(true); });
     audio.addEventListener("pause", function () { setPlaying(false); });
     tryPlay().then(function (ok) {
-      if (!ok) unlockEvents.forEach(function (ev) { document.addEventListener(ev, unlock, true); });
+      if (ok) return;
+      unlockEvents.forEach(function (ev) { document.addEventListener(ev, unlock, true); });
+      // 자동재생이 막힘 → 음악 버튼 옆에 '♪ 눌러서 음악 켜기' 안내 (재생되거나 끄면 사라짐)
+      var showHint = function () { if (audio.paused && !userMuted) bgmHint.hidden = false; };
+      if (!bgmBtn.hidden) showHint(); else audio.addEventListener("canplay", showHint, { once: true });
+    });
+    bgmHint.addEventListener("click", function (e) {
+      e.stopPropagation();
+      userMuted = false; stopUnlock(); bgmHint.hidden = true;
+      audio.play().catch(function () {});
     });
     bgmBtn.addEventListener("click", function (e) {
       e.stopPropagation();
       if (audio.paused) { userMuted = false; stopUnlock(); audio.play().catch(function () {}); }
       else { userMuted = true; stopUnlock(); audio.pause(); }
+      bgmHint.hidden = true;
     });
     var wasPlaying = false;
     document.addEventListener("visibilitychange", function () {
