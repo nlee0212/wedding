@@ -167,7 +167,7 @@
   themes.forEach(function (t) { mixed = mixed.concat(t.photos); });
   var G = [], curIds = [];
   var moreBtn = $("#galleryMore");
-  var FIRST = 9, STEP = 6, shown = FIRST; // 처음 9장, '더 보기' 한 번에 6장씩
+  var FIRST = 9, STEP = 15, shown = FIRST; // 처음 9장, '더 보기' 한 번에 15장씩
   function applyShown() {
     $$("#gallery button").forEach(function (b, i) { b.hidden = i >= shown; });
     var left = curIds.length - shown;
