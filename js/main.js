@@ -1100,9 +1100,9 @@
   });
 
   // ── 하객 사진 벽 (폴라로이드) ──
-  // 서버 photo_list(최신순, 숨김 제외)를 받아 최근 30장을 먼저, 나머지는 '펼쳐보기'로
+  // 서버 photo_list(최신순, 숨김 제외)를 받아 최근 20장(5장×4줄)을 먼저, 나머지는 '펼쳐보기'로
   var wall = $("#snapWall"), wallMore = $("#snapWallMore"), wallView = $("#wallView");
-  var WALL_FIRST = 30, wallItems = [], wallShown = WALL_FIRST, wallLoading = false;
+  var WALL_FIRST = 20, wallItems = [], wallShown = WALL_FIRST, wallLoading = false;
   function renderWall() {
     wall.innerHTML = "";
     wallItems.slice(0, wallShown).forEach(function (it, i) {
