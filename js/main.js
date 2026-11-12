@@ -1111,7 +1111,7 @@
       // 사진마다 살짝 다른 기울기 (id 로 정해서 새로고침해도 같은 모양)
       var h = 0;
       for (var k = 0; k < it.id.length; k++) h = (h * 31 + it.id.charCodeAt(k)) % 997;
-      b.style.setProperty("--tilt", ((h % 7) - 3) * 0.9 + "deg");
+      b.style.setProperty("--tilt", ((h % 5) - 2) * 0.6 + "deg"); // -1.2° ~ 1.2°
       var im = el("img");
       im.src = it.thumb; im.loading = i < 6 ? "eager" : "lazy"; im.alt = (it.name || "하객") + "님이 올린 사진";
       im.referrerPolicy = "no-referrer";
