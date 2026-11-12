@@ -64,11 +64,11 @@ window.WEDDING = {
 
   // 포인트 색: "film"(필름 웜톤) / "paper"(종이 청첩장) / "sage"(세이지) / "rose"(더스티 로즈)
   theme: "film",
-  cover: "images/gallery/full/r01.jpg",
+  cover: "images/gallery/full/13.jpg",
   petals: false, // 표지 위 떨어지는 꽃잎 효과
   closing: "images/gallery/full/33.jpg", // 엔딩 크레딧 배경 (어두운 사진이 잘 어울림)
-  infoImage: "images/gallery/full/r03.jpg", // 예식 정보 이미지 저장에 쓰는 사진
-  infoImageY: 0.45, // 위 사진을 위아래 어디서 자를지 (0 = 맨 위 ~ 1 = 맨 아래). 숫자를 키우면 얼굴이 위로 올라감
+  infoImage: "images/gallery/full/22.jpg", // 예식 정보 이미지 저장에 쓰는 사진
+  infoImageY: 0.12, // 위 사진을 위아래 어디서 자를지 (0 = 맨 위 ~ 1 = 맨 아래). 숫자를 키우면 얼굴이 위로 올라감
   // 엔딩 크레딧 [왼쪽, 오른쪽]
   credits: [
     ["Produced by", "our family"],
