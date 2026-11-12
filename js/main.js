@@ -753,9 +753,12 @@
     return pr && pr.then ? pr.then(function () { setPlaying(true); return true; }, function () { return false; }) : Promise.resolve(true);
   }
   var unlockEvents = ["pointerdown", "touchend", "click", "keydown"];
-  function unlock() {
+  function stopUnlock() { unlockEvents.forEach(function (ev) { document.removeEventListener(ev, unlock, true); }); }
+  function unlock(e) {
+    // 음악 버튼을 누른 경우는 버튼이 직접 처리 (여기서도 재생하면 버튼이 곧바로 다시 꺼 버림)
+    if (e && e.target && bgmBtn.contains(e.target)) return;
     tryPlay().then(function (ok) {
-      if (ok || userMuted) unlockEvents.forEach(function (ev) { document.removeEventListener(ev, unlock, true); });
+      if (ok || userMuted) stopUnlock();
     });
   }
   if (W.bgm) {
@@ -770,8 +773,8 @@
     });
     bgmBtn.addEventListener("click", function (e) {
       e.stopPropagation();
-      if (audio.paused) { userMuted = false; audio.play().catch(function () {}); }
-      else { userMuted = true; audio.pause(); }
+      if (audio.paused) { userMuted = false; stopUnlock(); audio.play().catch(function () {}); }
+      else { userMuted = true; stopUnlock(); audio.pause(); }
     });
     var wasPlaying = false;
     document.addEventListener("visibilitychange", function () {
