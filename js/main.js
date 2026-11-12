@@ -244,7 +244,14 @@
   function loadFeed() {
     if (!W.appsScriptUrl) return;
     callScript({ type: "feed_get" }).then(function (res) {
-      feedData = { likes: res.likes || {}, comments: res.comments || {} };
+      // 구글 시트는 "01" 같은 사진 번호를 숫자 1로 바꿔 저장함 → "1"로 돌아온 키를 원래 ID("01")로 되돌림
+      var byNum = {};
+      themes.forEach(function (t) { t.photos.forEach(function (id) { if (/^\d+$/.test(id)) byNum[String(Number(id))] = id; }); });
+      var fix = function (k) { k = String(k).trim(); return /^\d+(\.0+)?$/.test(k) ? (byNum[String(Number(k))] || k) : k; };
+      var likes = {}, comments = {};
+      Object.keys(res.likes || {}).forEach(function (k) { var id = fix(k); likes[id] = (likes[id] || 0) + (Number(res.likes[k]) || 0); });
+      Object.keys(res.comments || {}).forEach(function (k) { var id = fix(k); comments[id] = (comments[id] || []).concat(res.comments[k] || []); });
+      feedData = { likes: likes, comments: comments };
       feedLoaded = true;
       $$(".post").forEach(function (p) { updatePost(p); });
       updateBadges();
