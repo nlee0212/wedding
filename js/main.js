@@ -387,11 +387,8 @@
     setTimeout(loadFeed, 1500);
   }
   $("#feedBack").addEventListener("click", function () { if (history.state && history.state.feed) history.back(); else closeFeed(); });
-  // 갤러리 근처에 오면 하트·댓글 수를 미리 불러와 썸네일에 표시
-  if ("IntersectionObserver" in window) {
-    var fio = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { loadFeed(); fio.disconnect(); } }, { rootMargin: "300px" });
-    fio.observe($("#gallerySec"));
-  }
+  // 페이지를 열자마자 하트·댓글 수를 미리 불러와 썸네일에 표시 (서버 응답이 1~2초 걸려서)
+  loadFeed();
   // 휴대폰 '뒤로가기'로도 피드가 닫히게
   window.addEventListener("popstate", function () { if (feedOpen) closeFeed(); });
 
@@ -472,23 +469,35 @@
     var draw = function (lat, lng) {
       kmapEl.hidden = false;
       var pos = new km.LatLng(lat, lng);
-      // 휴대폰: 처음 지도에 닿는 손가락(페이지를 스크롤하다 스친 것)은 무시하고, 그다음부터는 끌어서 움직일 수 있음
-      // 지도가 화면 밖으로 나가면 다시 잠금. 잠긴 동안에는 확대·축소해도 예식장이 가운데
+      // 휴대폰: 처음엔 잠겨 있어 스크롤하다 스쳐도 안 움직임. 지도를 '탭'하면 풀려서 끌어 움직일 수 있음
+      // 잠긴 동안 "탭하면 지도를 움직일 수 있어요" 안내. 지도가 화면 밖으로 나가면 다시 잠금
       var map = new km.Map(kmapEl, { center: pos, level: 3, draggable: !isMobile, scrollwheel: false });
       map.addControl(new km.ZoomControl(), km.ControlPosition.RIGHT);
       var unlocked = !isMobile;
       km.event.addListener(map, "zoom_changed", function () { if (!unlocked) map.setCenter(pos); });
-      var tip = el("div", "kmap-tip", "이제 지도를 움직일 수 있어요");
-      kmapEl.appendChild(tip);
-      kmapEl.addEventListener("touchend", function () {
-        if (unlocked) return;
-        unlocked = true; map.setDraggable(true);
-        tip.classList.add("show"); setTimeout(function () { tip.classList.remove("show"); }, 1600);
-      }, { passive: true });
-      if (isMobile && "IntersectionObserver" in window) {
-        new IntersectionObserver(function (es) {
-          if (!es[0].isIntersecting && unlocked) { unlocked = false; map.setDraggable(false); map.setCenter(pos); }
-        }).observe(kmapEl);
+      if (isMobile) {
+        var tip = el("div", "kmap-tip show", "탭하면 지도를 움직일 수 있어요");
+        kmapEl.appendChild(tip);
+        var lock = function () {
+          unlocked = false; map.setDraggable(false); map.setCenter(pos);
+          tip.textContent = "탭하면 지도를 움직일 수 있어요"; tip.classList.add("show");
+        };
+        // 탭 판정: 손가락이 거의 안 움직이고(10px 이내) 짧게 뗐을 때만. 스크롤로 스친 건 제외
+        var t0 = null;
+        kmapEl.addEventListener("touchstart", function (e) {
+          t0 = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() } : null;
+        }, { passive: true, capture: true });
+        kmapEl.addEventListener("touchend", function (e) {
+          if (unlocked || !t0) return;
+          var c = e.changedTouches[0], moved = Math.abs(c.clientX - t0.x) + Math.abs(c.clientY - t0.y);
+          if (moved > 10 || Date.now() - t0.t > 500) return;
+          unlocked = true; map.setDraggable(true);
+          tip.textContent = "이제 지도를 움직일 수 있어요";
+          setTimeout(function () { if (unlocked) tip.classList.remove("show"); }, 1600);
+        }, { passive: true, capture: true });
+        if ("IntersectionObserver" in window) {
+          new IntersectionObserver(function (es) { if (!es[0].isIntersecting && unlocked) lock(); }).observe(kmapEl);
+        }
       }
       new km.Marker({ position: pos, map: map });
       var lab = el("div", "kmap-label", v.name);
@@ -1066,11 +1075,8 @@
         .then(function (res) { gbItems = res.items || []; renderGb(); })
         .catch(function () { gbList.innerHTML = ""; gbList.appendChild(el("li", "gb-empty", "방명록을 불러오지 못했어요.")); });
     };
-    // 화면 근처에 왔을 때 불러오기 (첫 로딩 가볍게)
-    if ("IntersectionObserver" in window) {
-      var gio = new IntersectionObserver(function (es) { if (es[0].isIntersecting && !gbLoaded) { loadGb(); gio.disconnect(); } }, { rootMargin: "400px" });
-      gio.observe($("#guestbookSec"));
-    } else loadGb();
+    // 페이지를 열자마자 미리 불러오기 (내려왔을 때 이미 보이게)
+    loadGb();
     gbMore.addEventListener("click", function () { gbShown += 10; renderGb(); });
     gbForm.gbmsg.addEventListener("input", function () { $("#gbLeft").textContent = 40 - Array.from(gbForm.gbmsg.value).length; });
     gbForm.addEventListener("submit", function (e) {
