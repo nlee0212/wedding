@@ -131,7 +131,7 @@
 
   var fmt = function (d) { return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); };
   // 캘린더에 추가: 아이폰·맥·PC → wedding.ics (기본 캘린더 앱의 '일정 추가' 화면이 열림)
-  //                안드로이드 → 구글 캘린더 (대부분의 기본 캘린더)
+  //                안드로이드 → 휴대폰 캘린더(.ics) / Google 캘린더 중 선택
   // ※ 날짜·장소를 바꾸면 wedding.ics 파일도 같이 고쳐야 함
   var gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
     "&text=" + encodeURIComponent(W.groom.name + " " + W.bride.name + " 결혼식") +
@@ -139,20 +139,26 @@
     "&location=" + encodeURIComponent(W.venue.name + " " + W.venue.hall + ", " + W.venue.address);
   var isAndroidUA = /Android/i.test(navigator.userAgent);
   var calBtn = $("#gcal");
-  // 안드로이드: '일정 추가' 인텐트 → 삼성 캘린더·구글 캘린더 등 설치된 캘린더 앱 중에서 고를 수 있음
-  // (인텐트를 못 여는 브라우저면 구글 캘린더 웹으로)
-  var enc = function (s) { return encodeURIComponent(s); };
-  var androidIntent = "intent://#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;" +
-    "S.title=" + enc(W.groom.name + " " + W.bride.name + " 결혼식") + ";" +
-    "l.beginTime=" + wd.getTime() + ";l.endTime=" + (wd.getTime() + 2 * 3600 * 1000) + ";" +
-    "S.eventLocation=" + enc(W.venue.name + " " + W.venue.hall + ", " + W.venue.address) + ";" +
-    "S.browser_fallback_url=" + enc(gcalUrl) + ";end";
-  calBtn.href = isAndroidUA ? androidIntent : "wedding.ics";
-  if (isAndroidUA) calBtn.removeAttribute("target");
   calBtn.textContent = "＋ 내 캘린더에 추가";
-  if (!isAndroidUA) { calBtn.removeAttribute("target"); calBtn.setAttribute("download", "김용현이나연_결혼식.ics"); }
-  // 아이폰 사파리는 download 속성이 있으면 저장만 하므로, 아이폰에서는 바로 열리게
-  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) calBtn.removeAttribute("download");
+  calBtn.removeAttribute("target");
+  if (isAndroidUA) {
+    // 안드로이드는 웹페이지에서 캘린더 앱의 '일정 추가' 화면을 직접 못 엶
+    // (크롬·카톡 브라우저가 막아서 예전 방식은 항상 구글 캘린더 웹으로 넘어갔음)
+    // → 휴대폰 캘린더(.ics 파일: 삼성 캘린더 등이 열어 줌)와 Google 캘린더 중에서 고르게 함
+    var calModal = $("#calModal");
+    var closeCal = function () { calModal.hidden = true; document.body.style.overflow = ""; };
+    $("#calGoogle").href = gcalUrl;
+    calBtn.href = "#";
+    calBtn.addEventListener("click", function (e) { e.preventDefault(); calModal.hidden = false; document.body.style.overflow = "hidden"; });
+    calModal.querySelector("[data-close]").addEventListener("click", closeCal);
+    calModal.addEventListener("click", function (e) { if (e.target === calModal) closeCal(); });
+    ["#calIcs", "#calGoogle"].forEach(function (sel) { $(sel).addEventListener("click", function () { setTimeout(closeCal, 300); }); });
+  } else {
+    // 아이폰·맥·PC: wedding.ics → 기본 캘린더 앱의 '일정 추가' 화면
+    calBtn.href = "wedding.ics";
+    // 아이폰 사파리는 download 속성이 있으면 저장만 하므로, 아이폰에서는 바로 열리게
+    if (!/iPhone|iPad|iPod/i.test(navigator.userAgent)) calBtn.setAttribute("download", "김용현이나연_결혼식.ics");
+  }
 
   // ── 갤러리 + 라이트박스 ──
   var g = $("#gallery"), lb = $("#lightbox"), lbImg = lb.querySelector("img"), cur = 0;

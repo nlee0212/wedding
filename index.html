@@ -181,6 +181,15 @@
 <div class="bgm-banner" id="bgmBanner" role="status">배경음악이 재생됩니다 · 오른쪽 위 버튼으로 끌 수 있어요</div>
 
 <!-- 참석 여부 팝업 -->
+<div class="modal" id="calModal" hidden>
+  <div class="modal-card cal-pick" role="dialog" aria-modal="true" aria-labelledby="calTitle">
+    <button class="modal-x" type="button" data-close aria-label="닫기">×</button>
+    <h3 id="calTitle">어느 캘린더에 추가할까요?</h3>
+    <p class="modal-desc">쓰시는 캘린더 앱을 골라 주세요.</p>
+    <a class="modal-submit" id="calIcs" href="wedding.ics" download="김용현이나연_결혼식.ics">📅 휴대폰 캘린더 (삼성 등)</a>
+    <a class="modal-submit cal-g" id="calGoogle" target="_blank" rel="noopener">Google 캘린더</a>
+  </div>
+</div>
 <div class="modal" id="rsvpModal" hidden>
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="rsvpTitle">
     <button class="modal-x" type="button" data-close aria-label="닫기">×</button>
