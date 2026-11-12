@@ -350,7 +350,22 @@
     // '게시'를 눌러도 입력칸 포커스가 유지되게 (포커스가 버튼으로 가면 키보드가 닫히며 화면이 튐)
     send.addEventListener("mousedown", function (e) { e.preventDefault(); });
     send.addEventListener("touchstart", function (e) { if (document.activeElement === tx || document.activeElement === nm) { e.preventDefault(); form.requestSubmit ? form.requestSubmit() : send.click(); } }, { passive: false });
-    // 댓글 목록이 바뀌어도 입력칸이 화면의 같은 자리에 머물도록 피드 스크롤을 보정
+    // 댓글을 다는 동안 입력칸이 '눈에 보이는 화면'의 같은 자리에 머물도록 피드 스크롤을 계속 맞춤
+    // (휴대폰 키보드가 닫히거나 브라우저가 스스로 스크롤해도, 댓글 목록이 길어져도 되돌려 놓음)
+    var vv = window.visualViewport;
+    var formTop = function () { return form.getBoundingClientRect().top - (vv ? vv.offsetTop : 0); };
+    var pinUntil = 0, pinTarget = 0, pinning = false;
+    var pin = function (ms) {
+      if (!pinning) pinTarget = formTop();
+      pinUntil = Math.max(pinUntil, Date.now() + ms);
+      if (pinning) return;
+      pinning = true;
+      (function step() {
+        var d = formTop() - pinTarget;
+        if (Math.abs(d) > 1) feedEl.scrollTop += d;
+        if (Date.now() < pinUntil) requestAnimationFrame(step); else pinning = false;
+      })();
+    };
     var keepPlace = function (fn) {
       var before = form.getBoundingClientRect().top;
       fn();
@@ -366,6 +381,7 @@
       if (!W.appsScriptUrl) return toast("아직 서버가 연결되지 않았어요");
       store.set("cmt-name", name);
       sending = true;
+      pin(1500);
       // 바로 화면에 보여 주고(흐리게), 서버 저장이 끝나면 진하게
       var mine = { name: name, text: text, pending: true };
       var list = (feedData.comments[id] = feedData.comments[id] || []);
@@ -376,12 +392,14 @@
         .then(function (res) {
           var i = list.indexOf(mine);
           if (i >= 0) list[i] = res.item || { name: name, text: text };
+          pin(800);
           keepPlace(function () { updatePost(post); });
         })
         .catch(function () {
           var i = list.indexOf(mine);
           if (i >= 0) list.splice(i, 1);
           if (!tx.value) tx.value = text;
+          pin(800);
           keepPlace(function () { updatePost(post); updateBadges(); });
           toast("댓글을 남기지 못했어요");
         })
