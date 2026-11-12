@@ -462,7 +462,8 @@ button { font-family: inherit; color: inherit; }
 .likes { padding: 0 14px; font-size: 13.5px; }
 .likes b { font-weight: 700; }
 .cmts { list-style: none; padding: 4px 14px 0; font-size: 13.5px; line-height: 1.6; }
-.cmts li { overflow-wrap: anywhere; }
+.cmts li { overflow-wrap: anywhere; transition: opacity .3s; }
+.cmts li.pending { opacity: .45; }
 .cmts b { font-weight: 700; margin-right: 2px; }
 .cmt-more { color: var(--muted); cursor: pointer; }
 .cmt-form { display: flex; gap: 6px; padding: 10px 12px 0; align-items: center; }
