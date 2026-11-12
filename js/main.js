@@ -472,8 +472,10 @@
     var draw = function (lat, lng) {
       kmapEl.hidden = false;
       var pos = new km.LatLng(lat, lng);
-      var map = new km.Map(kmapEl, { center: pos, level: 3, scrollwheel: false }); // 끌기·두 손가락 확대 가능 (PC 마우스 휠은 페이지 스크롤용으로 끔)
+      // 확대·축소(두 손가락, +/− 버튼)만 되고 끌어서 움직이기는 막음. 확대해도 예식장이 늘 가운데
+      var map = new km.Map(kmapEl, { center: pos, level: 3, draggable: false, scrollwheel: false });
       map.addControl(new km.ZoomControl(), km.ControlPosition.RIGHT);
+      km.event.addListener(map, "zoom_changed", function () { map.setCenter(pos); });
       new km.Marker({ position: pos, map: map });
       var lab = el("div", "kmap-label", v.name);
       new km.CustomOverlay({ position: pos, content: lab, yAnchor: 0.5, map: map });
