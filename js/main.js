@@ -148,6 +148,14 @@
   $("#calIcsSub").textContent = isIOSUA ? "기본 캘린더 앱" : isAndroidUA ? "삼성 캘린더 등" : "Outlook · Apple 캘린더 등";
   // 아이폰 사파리는 download 속성이 있으면 저장만 하므로, 아이폰에서는 바로 열리게
   if (!isIOSUA) calIcs.setAttribute("download", "김용현이나연_결혼식.ics");
+  // 실험 (?caltest 로 열었을 때만): 안드로이드에서 휴대폰 캘린더 앱이 .ics를 바로 받아 주는지 시험
+  // 받아 줄 앱이 없으면 browser_fallback_url 로 지금처럼 파일을 받음
+  if (isAndroidUA && /[?&]caltest\b/.test(location.search)) {
+    var icsAbs = new URL("wedding.ics", location.href);
+    calIcs.removeAttribute("download");
+    calIcs.href = "intent://" + icsAbs.host + icsAbs.pathname + "#Intent;scheme=https;action=android.intent.action.VIEW;type=text/calendar;" +
+      "S.browser_fallback_url=" + encodeURIComponent(icsAbs.href) + ";end";
+  }
   $("#calGoogle").href = gcalUrl;
   var closeCal = function () { calModal.hidden = true; document.body.style.overflow = ""; };
   calBtn.addEventListener("click", function (e) { e.preventDefault(); calModal.hidden = false; document.body.style.overflow = "hidden"; });
@@ -710,16 +718,33 @@
   }
   pv.addEventListener("click", function () { $("#shareImage").click(); });
 
+  var saveModal = $("#saveModal");
+  var closeSave = function () { saveModal.hidden = true; document.body.style.overflow = ""; };
+  saveModal.querySelector("[data-close]").addEventListener("click", closeSave);
+  saveModal.addEventListener("click", function (e) { if (e.target === saveModal) closeSave(); });
+  $("#saveBtn").addEventListener("click", function () { setTimeout(function () { toast("갤러리의 'Download' 앨범에 저장됐어요"); }, 400); });
   $("#shareImage").addEventListener("click", function () {
     var btn = this;
     btn.disabled = true;
     getInfoImage().then(function (blob) {
       var name = "wedding_" + Y + pad(M + 1) + pad(D) + ".jpg";
       var file = new File([blob], name, { type: "image/jpeg" });
-      // 휴대폰: 공유창의 '이미지 저장'으로 앨범에 바로 저장 / PC: 파일 다운로드
-      if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
+      // 아이폰: 공유창의 '이미지 저장'으로 앨범에 바로 저장
+      if (isIOS && navigator.canShare && navigator.canShare({ files: [file] })) {
         return navigator.share({ files: [file], title: shareTitle }).catch(function () {});
       }
+      // 안드로이드: 공유창에 '이미지 저장'이 없어서, 이미지 창을 띄우고 '갤러리에 저장'(다운로드 → 갤러리 Download 앨범)
+      // 카톡 브라우저 등에서 다운로드가 막히면 사진을 길게 눌러 저장할 수 있게 data URL 이미지로 보여 줌
+      if (isAndroid) {
+        return new Promise(function (res) { var r = new FileReader(); r.onload = function () { res(r.result); }; r.readAsDataURL(blob); })
+          .then(function (dataUrl) {
+            $("#saveImg").src = dataUrl;
+            var sb = $("#saveBtn");
+            sb.href = dataUrl; sb.download = name;
+            saveModal.hidden = false; document.body.style.overflow = "hidden";
+          });
+      }
+      // PC: 파일 다운로드
       var a = el("a");
       a.href = URL.createObjectURL(blob);
       a.download = name;
