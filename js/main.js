@@ -144,7 +144,8 @@
   // 모든 기기: 기본 캘린더(.ics) / Google 캘린더 중에서 고르게 함
   // (안드로이드는 웹페이지에서 캘린더 앱의 '일정 추가' 화면을 직접 못 열어서, 예전엔 항상 구글 캘린더 웹으로 넘어갔음)
   var calModal = $("#calModal"), calIcs = $("#calIcs");
-  calIcs.textContent = isIOSUA ? "📅 iPhone 캘린더" : isAndroidUA ? "📅 휴대폰 캘린더 (삼성 등)" : "📅 캘린더 앱 (Outlook·Apple 등)";
+  $("#calIcsName").textContent = isIOSUA ? "iPhone 캘린더" : isAndroidUA ? "휴대폰 캘린더" : "캘린더 앱";
+  $("#calIcsSub").textContent = isIOSUA ? "기본 캘린더 앱" : isAndroidUA ? "삼성 캘린더 등" : "Outlook · Apple 캘린더 등";
   // 아이폰 사파리는 download 속성이 있으면 저장만 하므로, 아이폰에서는 바로 열리게
   if (!isIOSUA) calIcs.setAttribute("download", "김용현이나연_결혼식.ics");
   $("#calGoogle").href = gcalUrl;
