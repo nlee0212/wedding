@@ -295,7 +295,7 @@
       ul.appendChild(more);
     }
     (all ? list : list.slice(-2)).forEach(function (c) {
-      var li = el("li");
+      var li = el("li", c.pending ? "pending" : null);
       li.appendChild(el("b", null, c.name));
       li.append(" " + c.text);
       ul.appendChild(li);
@@ -347,24 +347,45 @@
     tx.placeholder = "댓글 달기…"; tx.maxLength = 60; send.type = "submit";
     form.appendChild(nm); form.appendChild(tx); form.appendChild(send);
     cmt.addEventListener("click", function () { (nm.value ? tx : nm).focus(); });
+    // '게시'를 눌러도 입력칸 포커스가 유지되게 (포커스가 버튼으로 가면 키보드가 닫히며 화면이 튐)
+    send.addEventListener("mousedown", function (e) { e.preventDefault(); });
+    send.addEventListener("touchstart", function (e) { if (document.activeElement === tx || document.activeElement === nm) { e.preventDefault(); form.requestSubmit ? form.requestSubmit() : send.click(); } }, { passive: false });
+    // 댓글 목록이 바뀌어도 입력칸이 화면의 같은 자리에 머물도록 피드 스크롤을 보정
+    var keepPlace = function (fn) {
+      var before = form.getBoundingClientRect().top;
+      fn();
+      feedEl.scrollTop += form.getBoundingClientRect().top - before;
+    };
+    var sending = false;
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+      if (sending) return;
       var name = nm.value.trim(), text = tx.value.trim();
       if (!name) { nm.focus(); return toast("이름을 입력해 주세요"); }
       if (!text) { tx.focus(); return; }
       if (!W.appsScriptUrl) return toast("아직 서버가 연결되지 않았어요");
       store.set("cmt-name", name);
-      send.disabled = true;
+      sending = true;
+      // 바로 화면에 보여 주고(흐리게), 서버 저장이 끝나면 진하게
+      var mine = { name: name, text: text, pending: true };
+      var list = (feedData.comments[id] = feedData.comments[id] || []);
+      list.push(mine);
+      tx.value = "";
+      keepPlace(function () { post.classList.add("all"); updatePost(post); updateBadges(); });
       callScript({ type: "feed_comment", id: id, name: name, text: text })
         .then(function (res) {
-          (feedData.comments[id] = feedData.comments[id] || []).push(res.item);
-          tx.value = "";
-          post.classList.add("all");
-          updatePost(post);
-          updateBadges(); // 갤러리 정사각형의 💬 숫자도 바로 반영
+          var i = list.indexOf(mine);
+          if (i >= 0) list[i] = res.item || { name: name, text: text };
+          keepPlace(function () { updatePost(post); });
         })
-        .catch(function () { toast("댓글을 남기지 못했어요"); })
-        .finally(function () { send.disabled = false; });
+        .catch(function () {
+          var i = list.indexOf(mine);
+          if (i >= 0) list.splice(i, 1);
+          if (!tx.value) tx.value = text;
+          keepPlace(function () { updatePost(post); updateBadges(); });
+          toast("댓글을 남기지 못했어요");
+        })
+        .finally(function () { sending = false; });
     });
     [head, box, act, likes, ul, form].forEach(function (n) { post.appendChild(n); });
     updatePost(post);
