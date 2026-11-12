@@ -479,25 +479,20 @@
       var unlocked = !isMobile;
       km.event.addListener(map, "zoom_changed", function () { if (!unlocked) map.setCenter(pos); });
       if (isMobile) {
+        // 잠긴 동안엔 지도 위에 투명한 덮개를 씌움 → 지도 위에서 쓸어도 페이지가 그대로 스크롤됨
+        // 덮개를 '탭'하면(스크롤 말고) 덮개가 사라지고 지도를 움직이거나 확대할 수 있음
+        var shield = el("div", "kmap-lock");
         var tip = el("div", "kmap-tip show", "탭하면 지도를 움직일 수 있어요");
-        kmapEl.appendChild(tip);
+        kmapEl.appendChild(shield); kmapEl.appendChild(tip);
         var lock = function () {
-          unlocked = false; map.setDraggable(false); map.setCenter(pos);
+          unlocked = false; map.setDraggable(false); map.setCenter(pos); shield.hidden = false;
           tip.textContent = "탭하면 지도를 움직일 수 있어요"; tip.classList.add("show");
         };
-        // 탭 판정: 손가락이 거의 안 움직이고(10px 이내) 짧게 뗐을 때만. 스크롤로 스친 건 제외
-        var t0 = null;
-        kmapEl.addEventListener("touchstart", function (e) {
-          t0 = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() } : null;
-        }, { passive: true, capture: true });
-        kmapEl.addEventListener("touchend", function (e) {
-          if (unlocked || !t0) return;
-          var c = e.changedTouches[0], moved = Math.abs(c.clientX - t0.x) + Math.abs(c.clientY - t0.y);
-          if (moved > 10 || Date.now() - t0.t > 500) return;
-          unlocked = true; map.setDraggable(true);
+        shield.addEventListener("click", function () { // click 은 탭일 때만 생김 (스크롤하면 안 생김)
+          unlocked = true; map.setDraggable(true); shield.hidden = true;
           tip.textContent = "이제 지도를 움직일 수 있어요";
           setTimeout(function () { if (unlocked) tip.classList.remove("show"); }, 1600);
-        }, { passive: true, capture: true });
+        });
         if ("IntersectionObserver" in window) {
           new IntersectionObserver(function (es) { if (!es[0].isIntersecting && unlocked) lock(); }).observe(kmapEl);
         }
