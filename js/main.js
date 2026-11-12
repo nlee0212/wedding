@@ -823,7 +823,7 @@
     tryPlay().then(function (ok) {
       if (ok) return;
       unlockEvents.forEach(function (ev) { document.addEventListener(ev, unlock, true); });
-      // 자동재생이 막힘 → 음악 버튼 옆에 '♪ 눌러서 음악 켜기' 안내 (재생되거나 끄면 사라짐)
+      // 자동재생이 막힘 → 음악 버튼 옆에 '♪ 화면을 터치하면 음악이 나와요' 안내 (재생되거나 끄면 사라짐)
       var showHint = function () { if (audio.paused && !userMuted) bgmHint.hidden = false; };
       if (!bgmBtn.hidden) showHint(); else audio.addEventListener("canplay", showHint, { once: true });
     });
