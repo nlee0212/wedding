@@ -1111,16 +1111,16 @@
       // 사진마다 살짝 다른 기울기 (id 로 정해서 새로고침해도 같은 모양)
       var h = 0;
       for (var k = 0; k < it.id.length; k++) h = (h * 31 + it.id.charCodeAt(k)) % 997;
-      b.style.setProperty("--tilt", ((h % 5) - 2) * 0.6 + "deg"); // -1.2° ~ 1.2°
+      b.style.setProperty("--tilt", ((h % 5) - 2) * 0.5 + "deg"); // -1° ~ 1°
       var im = el("img");
       im.src = it.thumb; im.loading = i < 6 ? "eager" : "lazy"; im.alt = (it.name || "하객") + "님이 올린 사진";
       im.referrerPolicy = "no-referrer";
       im.addEventListener("error", function () { b.hidden = true; }); // 깨진 썸네일은 숨김
       b.appendChild(im);
-      b.appendChild(el("span", "polaroid-name", it.name ? "from. " + it.name : ""));
+      b.appendChild(el("span", "polaroid-name", it.name || "")); // 아래 여백에 네임펜으로 쓴 것처럼 이름만
       b.addEventListener("click", function () {
         wallView.querySelector("img").src = it.thumb;
-        wallView.querySelector("figcaption").textContent = it.name ? "from. " + it.name : "";
+        wallView.querySelector("figcaption").textContent = it.name || "";
         wallView.hidden = false;
         document.body.style.overflow = "hidden";
       });
@@ -1130,11 +1130,33 @@
     wallMore.hidden = left <= 0;
     if (left > 0) wallMore.textContent = "⌄ 펼쳐보기 (" + left + "장 더)";
   }
+  // 한 사람 사진으로 도배되지 않게: 올린 사람별로 묶고, 사람 순서·각자 사진 순서를 섞은 뒤
+  // 한 사람씩 번갈아 한 장씩 뽑음 (이름 없이 올린 사진은 각각 다른 사람으로 봄). 들어올 때마다 바뀜
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  function spreadByUploader(items) {
+    var groups = {}, keys = [];
+    items.forEach(function (it, i) {
+      var k = (it.name || "").trim() || "\u0000" + i;
+      if (!groups[k]) { groups[k] = []; keys.push(k); }
+      groups[k].push(it);
+    });
+    keys = shuffle(keys);
+    keys.forEach(function (k) { shuffle(groups[k]); });
+    var out = [];
+    for (var round = 0, more = true; more; round++) {
+      more = false;
+      keys.forEach(function (k) { if (groups[k][round]) { out.push(groups[k][round]); more = true; } });
+    }
+    return out;
+  }
   function loadWall() {
     if (!W.appsScriptUrl || wallLoading) return;
     wallLoading = true;
     callScript({ type: "photo_list" })
-      .then(function (res) { wallItems = res.items || []; renderWall(); })
+      .then(function (res) { wallItems = spreadByUploader(res.items || []); renderWall(); })
       .catch(function () {})
       .finally(function () { wallLoading = false; });
   }

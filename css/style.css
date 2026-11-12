@@ -487,18 +487,30 @@ button { font-family: inherit; color: inherit; }
 .info-preview span { font-size: 11.5px; color: var(--muted); }
 
 /* 하객 사진 벽 (폴라로이드) */
-/* 즉석카메라 사진처럼: 작게 4열, 하얀 테두리 + 아래 여백 넓게, 사진은 세로로 살짝 긴 직사각형(3:4) */
-.wall { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 9px; margin-top: 24px; padding: 0 2px; }
+/* 폴라로이드: 두꺼운 하얀 테두리 + 아래 여백 넓게, 사진은 세로로 살짝 긴 직사각형, 모서리에 마스킹 테이프 */
+.wall { display: grid; grid-template-columns: repeat(8, 1fr); gap: 11px 7px; margin-top: 24px; padding: 4px 4px 0; } /* 한 장 크기는 예전의 가로세로 반 */
 .wall:empty { display: none; }
-.polaroid { border: 0; background: #fff; padding: 4px 4px 0; border-radius: 1px; box-shadow: 0 1px 2px rgba(0, 0, 0, .08), 0 3px 8px rgba(0, 0, 0, .06); transform: rotate(var(--tilt, 0deg)); cursor: pointer; display: flex; flex-direction: column; transition: transform .2s; }
+.polaroid {
+  position: relative; border: 0; background: #fff; padding: 7% 7% 0; cursor: pointer;
+  display: flex; flex-direction: column; transform: rotate(var(--tilt, 0deg)); transition: transform .2s;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .1), 0 2px 5px rgba(0, 0, 0, .07);
+}
 .polaroid:active { transform: rotate(0deg) scale(.96); }
-.polaroid img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #f2efe9; }
-.polaroid-name { height: 17px; line-height: 17px; font-family: var(--script); font-size: 10px; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 2px; }
+.polaroid img { width: 100%; aspect-ratio: 5 / 6; object-fit: cover; background: #ece7df; } /* 불러오는 동안 연한 베이지 */
+.polaroid-name { height: 12px; line-height: 13px; font-family: "Nanum Pen Script", var(--sans); font-size: 9px; color: #2b2b2b; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 1px; text-align: center; transform: rotate(-2deg); } /* 네임펜으로 쓴 이름 */
+/* 마스킹 테이프 (오른쪽 위, 왼쪽 아래) */
+.polaroid::before, .polaroid::after {
+  content: ""; position: absolute; width: 44%; height: 6px; pointer-events: none;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,.18) 0 2px, rgba(0,0,0,.02) 2px 4px), rgba(226, 226, 222, .82);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .06);
+}
+.polaroid::before { top: -2px; right: -13%; transform: rotate(38deg); }
+.polaroid::after { bottom: -2px; left: -15%; transform: rotate(40deg); }
 #snapWallMore { margin-top: 22px; }
 .wall-view { position: fixed; inset: 0; z-index: 70; background: rgba(0, 0, 0, .88); display: flex; align-items: center; justify-content: center; padding: 20px; }
 .wall-view figure { background: #fff; padding: 10px 10px 0; max-width: 100%; }
 .wall-view img { display: block; max-width: min(88vw, 400px); max-height: 74vh; object-fit: contain; }
-.wall-view figcaption { min-height: 36px; line-height: 36px; text-align: center; font-family: var(--script); font-size: 18px; color: var(--ink-soft); }
+.wall-view figcaption { min-height: 40px; line-height: 42px; text-align: center; font-family: "Nanum Pen Script", var(--sans); font-size: 26px; color: #2b2b2b; }
 .wall-view .lb-close { position: absolute; top: 12px; right: 8px; background: none; border: 0; color: #fff; font-size: 38px; cursor: pointer; }
 .cmt-del { border: 0; background: none; color: var(--muted); font-family: var(--sans); font-size: 11.5px; margin-left: 6px; padding: 0 2px; cursor: pointer; text-decoration: underline; }
 .cmt-del:disabled { opacity: .5; }
