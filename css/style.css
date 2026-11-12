@@ -164,7 +164,7 @@ button { font-family: inherit; color: inherit; }
 .pill.white { background: #fff; color: var(--ink); box-shadow: 0 2px 12px rgba(0, 0, 0, .12); border: 1px solid #eee; }
 
 /* 갤러리 */
-.chips { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: -4px 0 18px; }
+.chips { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 18px 0 18px; } /* GALLERY 글자와 간격 */
 .chip {
   width: 46px; height: 46px; display: inline-flex; align-items: center; justify-content: center;
   border: 1px solid var(--line-soft); background: #fff; border-radius: 50%; cursor: pointer; padding: 0;

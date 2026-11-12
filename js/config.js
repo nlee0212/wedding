@@ -100,7 +100,7 @@ window.WEDDING = {
   // 계좌번호 — 전부 TEMP
   accounts: {
     groom: [
-      { role: "신랑", name: "김용현", bank: "TEMP은행", number: "000-0000-0000-01" },
+      { role: "신랑", name: "김용현", bank: "토스뱅크", number: "1000-1895-7946" },
       { role: "아버지", name: "김웅수", bank: "TEMP은행", number: "000-0000-0000-02" },
       { role: "어머니", name: "이은영", bank: "TEMP은행", number: "000-0000-0000-03" },
     ],

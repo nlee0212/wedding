@@ -139,7 +139,16 @@
     "&location=" + encodeURIComponent(W.venue.name + " " + W.venue.hall + ", " + W.venue.address);
   var isAndroidUA = /Android/i.test(navigator.userAgent);
   var calBtn = $("#gcal");
-  calBtn.href = isAndroidUA ? gcalUrl : "wedding.ics";
+  // 안드로이드: '일정 추가' 인텐트 → 삼성 캘린더·구글 캘린더 등 설치된 캘린더 앱 중에서 고를 수 있음
+  // (인텐트를 못 여는 브라우저면 구글 캘린더 웹으로)
+  var enc = function (s) { return encodeURIComponent(s); };
+  var androidIntent = "intent://#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;" +
+    "S.title=" + enc(W.groom.name + " " + W.bride.name + " 결혼식") + ";" +
+    "l.beginTime=" + wd.getTime() + ";l.endTime=" + (wd.getTime() + 2 * 3600 * 1000) + ";" +
+    "S.eventLocation=" + enc(W.venue.name + " " + W.venue.hall + ", " + W.venue.address) + ";" +
+    "S.browser_fallback_url=" + enc(gcalUrl) + ";end";
+  calBtn.href = isAndroidUA ? androidIntent : "wedding.ics";
+  if (isAndroidUA) calBtn.removeAttribute("target");
   calBtn.textContent = "＋ 내 캘린더에 추가";
   if (!isAndroidUA) { calBtn.removeAttribute("target"); calBtn.setAttribute("download", "김용현이나연_결혼식.ics"); }
   // 아이폰 사파리는 download 속성이 있으면 저장만 하므로, 아이폰에서는 바로 열리게
@@ -247,7 +256,7 @@
       var badge = b.querySelector(".thumb-badge");
       if (!badge) return;
       var id = b.dataset.id, n = feedData.likes[id] || 0, c = (feedData.comments[id] || []).length;
-      badge.textContent = (n ? "♥ " + n : "") + (n && c ? "  " : "") + (c ? "💬 " + c : "");
+      badge.textContent = (n ? "❤️ " + n : "") + (n && c ? "  " : "") + (c ? "💬 " + c : "");
       badge.hidden = !(n || c);
     });
   }
