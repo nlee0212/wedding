@@ -1117,40 +1117,47 @@
       im.referrerPolicy = "no-referrer";
       im.addEventListener("error", function () { b.hidden = true; }); // 깨진 썸네일은 숨김
       b.appendChild(im);
-      b.appendChild(el("span", "polaroid-name", it.name || "")); // 아래 여백에 네임펜으로 쓴 것처럼 이름만
+      var label = it.name ? "📸 " + it.name : ""; // 아래 여백: 📸 이름 (이름 없으면 비움)
+      b.appendChild(el("span", "polaroid-name", label));
       b.addEventListener("click", function () {
         wallView.querySelector("img").src = it.thumb;
-        wallView.querySelector("figcaption").textContent = it.name || "";
+        wallView.querySelector(".polaroid-name").textContent = label;
         wallView.hidden = false;
         document.body.style.overflow = "hidden";
       });
       wall.appendChild(b);
     });
+    // 펼쳐보기: 누를 때마다 4줄(20장)씩. 버튼엔 이번에 새로 보일 장수, 다 펼치면 '접기'
     var left = wallItems.length - wallShown;
-    wallMore.hidden = left <= 0;
-    if (left > 0) wallMore.textContent = "⌄ 펼쳐보기 (" + left + "장 더)";
+    wallMore.hidden = wallItems.length <= WALL_FIRST;
+    wallMore.textContent = left > 0 ? "⌄ 펼쳐보기 (" + Math.min(WALL_FIRST, left) + "장 더)" : "⌃ 접기";
   }
-  // 한 사람 사진으로 도배되지 않게: 올린 사람별로 묶고, 사람 순서·각자 사진 순서를 섞은 뒤
-  // 한 사람씩 번갈아 한 장씩 뽑음 (이름 없이 올린 사진은 각각 다른 사람으로 봄). 들어올 때마다 바뀜
+  // 사진 고르기: 올린 사람마다 최소 1장은 꼭 보이게 하고, 남은 자리는 전체 사진에서 랜덤.
+  // (이름 없이 올린 사진은 '이름 없음' 한 사람으로 묶음) 처음 보이는 칸 안에서는 다시 섞어서,
+  // 두 사람이 비슷하게 올렸으면 거의 반반씩 섞여 나옴. 들어올 때마다 바뀜
   function shuffle(a) {
     for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
     return a;
   }
   function spreadByUploader(items) {
     var groups = {}, keys = [];
-    items.forEach(function (it, i) {
-      var k = (it.name || "").trim() || "\u0000" + i;
+    items.forEach(function (it) {
+      var k = (it.name || "").trim(); // "" = 이름 없음 (한 사람으로)
       if (!groups[k]) { groups[k] = []; keys.push(k); }
       groups[k].push(it);
     });
-    keys = shuffle(keys);
-    keys.forEach(function (k) { shuffle(groups[k]); });
-    var out = [];
-    for (var round = 0, more = true; more; round++) {
-      more = false;
-      keys.forEach(function (k) { if (groups[k][round]) { out.push(groups[k][round]); more = true; } });
-    }
-    return out;
+    var picked = [], rest = [];
+    keys.forEach(function (k) {
+      var g = shuffle(groups[k].slice());
+      picked.push(g[0]);              // 사람마다 1장 보장
+      rest = rest.concat(g.slice(1));
+    });
+    shuffle(picked);
+    shuffle(rest);                    // 나머지는 사람 구분 없이 전체 랜덤
+    var room = Math.max(0, WALL_FIRST - picked.length);
+    var first = shuffle(picked.slice(0, WALL_FIRST).concat(rest.slice(0, room)));
+    // 사람이 WALL_FIRST 보다 많으면 보장분 중 남는 것은 펼쳐보기 쪽으로
+    return first.concat(shuffle(picked.slice(WALL_FIRST).concat(rest.slice(room))));
   }
   function loadWall() {
     if (!W.appsScriptUrl || wallLoading) return;
@@ -1160,7 +1167,16 @@
       .catch(function () {})
       .finally(function () { wallLoading = false; });
   }
-  wallMore.addEventListener("click", function () { wallShown = Math.max(WALL_FIRST, wallItems.length); renderWall(); });
+  wallMore.addEventListener("click", function () {
+    if (wallShown >= wallItems.length) { // 다 펼친 상태 → 접기
+      wallShown = WALL_FIRST;
+      renderWall();
+      $("#snapSec").scrollIntoView({ behavior: "smooth" });
+    } else {
+      wallShown = Math.min(wallItems.length, wallShown + WALL_FIRST);
+      renderWall();
+    }
+  });
   var closeWallView = function () { wallView.hidden = true; document.body.style.overflow = ""; };
   wallView.querySelector(".lb-close").addEventListener("click", closeWallView);
   wallView.addEventListener("click", function (e) { if (e.target === wallView) closeWallView(); });

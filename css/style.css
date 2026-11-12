@@ -516,9 +516,10 @@ button { font-family: inherit; color: inherit; }
 .polaroid::after { bottom: -2px; left: -15%; transform: rotate(40deg); }
 #snapWallMore { margin-top: 22px; }
 .wall-view { position: fixed; inset: 0; z-index: 70; background: rgba(0, 0, 0, .88); display: flex; align-items: center; justify-content: center; padding: 20px; }
-.wall-view figure { background: #fff; padding: 10px 10px 0; max-width: 100%; }
-.wall-view img { display: block; max-width: min(88vw, 400px); max-height: 74vh; object-fit: contain; }
-.wall-view figcaption { min-height: 40px; line-height: 42px; text-align: center; font-family: var(--sans); font-size: 16px; color: #3a3a3a; }
+/* 크게 보기: 벽의 폴라로이드와 같은 비율·테이프, 화면에 맞는 크기로 */
+.polaroid-big { --w: min(74vw, 330px, calc((100svh - 140px) * 2 / 3)); width: var(--w); padding: calc(var(--w) * .06) calc(var(--w) * .06) 0; transform: none; cursor: default; box-shadow: 0 6px 24px rgba(0, 0, 0, .35); }
+.polaroid-big:active { transform: none; }
+.polaroid-big .polaroid-name { font-size: 17px; }
 .wall-view .lb-close { position: absolute; top: 12px; right: 8px; background: none; border: 0; color: #fff; font-size: 38px; cursor: pointer; }
 .cmt-del { border: 0; background: none; color: var(--muted); font-family: var(--sans); font-size: 11.5px; margin-left: 6px; padding: 0 2px; cursor: pointer; text-decoration: underline; }
 .cmt-del:disabled { opacity: .5; }
