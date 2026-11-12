@@ -168,7 +168,7 @@
   var themes = (W.gallery || []).length && typeof W.gallery[0] === "string"
     ? [{ emoji: "", name: "전체", photos: W.gallery }]
     : (W.gallery || []);
-  // 각 테마 안에서는 파일명 순서로 정렬 (01 … 11, 11a, 12 … 15, 15a, 16, 16a, b01 …, tw01 …). 숫자는 크기대로(2 < 10)
+  // 각 테마 안에서는 파일명 순서로 정렬 (01 … 11, 11a, 12 … 15, 15a, 16, 16a, b01 …, tw03 …). 숫자는 크기대로(2 < 10)
   // 특정 사진 바로 뒤에 넣고 싶으면 파일명 끝에 a, b 를 붙이면 됨 (예: 15a → 15 바로 다음)
   themes.forEach(function (t) {
     t.photos = t.photos.slice().sort(function (a, b) { return a.localeCompare(b, "en", { numeric: true }); });
