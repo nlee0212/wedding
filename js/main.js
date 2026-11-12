@@ -459,6 +459,45 @@
   else $("#wayTel").hidden = true;
   $("#copyAddr").addEventListener("click", function () { copy(v.address, "주소가 복사되었습니다"); });
 
+  // 약도: 카카오 지도 (kakaoKey 사용. Kakao Developers 앱 설정에서 '카카오맵' 사용을 켜야 함)
+  // 불러오기에 실패하면 지도 칸은 숨긴 채로 두고, 아래 지도 앱 버튼만 보임
+  var kmapEl = $("#kmap");
+  function drawKmap() {
+    var km = window.kakao && window.kakao.maps;
+    var draw = function (lat, lng) {
+      kmapEl.hidden = false;
+      var pos = new km.LatLng(lat, lng);
+      var map = new km.Map(kmapEl, { center: pos, level: 3, draggable: false, scrollwheel: false, disableDoubleClickZoom: true });
+      new km.Marker({ position: pos, map: map });
+      var lab = el("div", "kmap-label", v.name);
+      new km.CustomOverlay({ position: pos, content: lab, yAnchor: 0.5, map: map });
+      map.relayout(); map.setCenter(pos);
+      // 지도를 누르면 카카오맵 앱/웹으로
+      kmapEl.addEventListener("click", function () { $("#mapKakao").click(); });
+    };
+    if (hasXY) return draw(Number(v.lat), Number(v.lng));
+    var places = new km.services.Places();
+    places.keywordSearch(v.mapQuery, function (r, st) {
+      if (st === km.services.Status.OK && r.length) return draw(Number(r[0].y), Number(r[0].x));
+      // 이름으로 못 찾으면 도로명 주소(층·동 빼고)로
+      var road = (v.address.match(/^.*?\d+(-\d+)?(?=\s|$)/) || [v.address])[0];
+      new km.services.Geocoder().addressSearch(road, function (g, st2) {
+        if (st2 === km.services.Status.OK && g.length) draw(Number(g[0].y), Number(g[0].x));
+      });
+    });
+  }
+  function loadKmap() {
+    if (!W.kakaoKey) return;
+    var s = document.createElement("script");
+    s.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=" + W.kakaoKey + "&libraries=services&autoload=false";
+    s.onload = function () { try { window.kakao.maps.load(drawKmap); } catch (e) {} };
+    document.head.appendChild(s);
+  }
+  if ("IntersectionObserver" in window) {
+    var kio = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { kio.disconnect(); loadKmap(); } }, { rootMargin: "600px" });
+    kio.observe(kmapEl.parentNode);
+  } else loadKmap();
+
   // 안내 탭 (오시는 길 / 식사 안내)
   $$(".tabs button").forEach(function (b) {
     b.addEventListener("click", function () {
