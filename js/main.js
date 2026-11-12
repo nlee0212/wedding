@@ -141,24 +141,20 @@
   calBtn.textContent = "＋ 내 캘린더에 추가";
   calBtn.removeAttribute("target");
   calBtn.href = "#";
-  // 모든 기기: 기본 캘린더(.ics) / Google 캘린더 중에서 고르게 함
-  // (안드로이드는 웹페이지에서 캘린더 앱의 '일정 추가' 화면을 직접 못 열어서, 예전엔 항상 구글 캘린더 웹으로 넘어갔음)
+  // 아이폰·PC: 기본 캘린더(.ics) / Google 캘린더 선택 창, 안드로이드: Google 캘린더로 바로
   var calModal = $("#calModal"), calIcs = $("#calIcs");
   $("#calIcsName").textContent = isIOSUA ? "iPhone 캘린더" : isAndroidUA ? "휴대폰 캘린더" : "캘린더 앱";
   $("#calIcsSub").textContent = isIOSUA ? "기본 캘린더 앱" : isAndroidUA ? "삼성 캘린더 등" : "Outlook · Apple 캘린더 등";
   // 아이폰 사파리는 download 속성이 있으면 저장만 하므로, 아이폰에서는 바로 열리게
   if (!isIOSUA) calIcs.setAttribute("download", "김용현이나연_결혼식.ics");
-  // 실험 (?caltest 로 열었을 때만): 안드로이드에서 휴대폰 캘린더 앱이 .ics를 바로 받아 주는지 시험
-  // 받아 줄 앱이 없으면 browser_fallback_url 로 지금처럼 파일을 받음
-  if (isAndroidUA && /[?&]caltest\b/.test(location.search)) {
-    var icsAbs = new URL("wedding.ics", location.href);
-    calIcs.removeAttribute("download");
-    calIcs.href = "intent://" + icsAbs.host + icsAbs.pathname + "#Intent;scheme=https;action=android.intent.action.VIEW;type=text/calendar;" +
-      "S.browser_fallback_url=" + encodeURIComponent(icsAbs.href) + ";end";
-  }
   $("#calGoogle").href = gcalUrl;
   var closeCal = function () { calModal.hidden = true; document.body.style.overflow = ""; };
-  calBtn.addEventListener("click", function (e) { e.preventDefault(); calModal.hidden = false; document.body.style.overflow = "hidden"; });
+  if (isAndroidUA) {
+    // 안드로이드: 웹에서 휴대폰 캘린더를 바로 열 수 없어 파일 다운로드가 돼 버림 → 선택 창 없이 Google 캘린더로 바로
+    // (삼성 캘린더도 구글 계정과 연동돼 있으면 같이 보임)
+    calBtn.textContent = "＋ Google 캘린더에 추가";
+    calBtn.href = gcalUrl; calBtn.target = "_blank"; calBtn.rel = "noopener";
+  } else calBtn.addEventListener("click", function (e) { e.preventDefault(); calModal.hidden = false; document.body.style.overflow = "hidden"; });
   calModal.querySelector("[data-close]").addEventListener("click", closeCal);
   calModal.addEventListener("click", function (e) { if (e.target === calModal) closeCal(); });
   [calIcs, $("#calGoogle")].forEach(function (x) { x.addEventListener("click", function () { setTimeout(closeCal, 300); }); });
