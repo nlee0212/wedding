@@ -951,6 +951,7 @@
     snapGrid.innerHTML = "";
     picked.forEach(function (p, i) {
       var d = el("div", p.state);
+      d.style.setProperty("--tilt", [-3, 2.5, -1.5, 3, -2.5, 1.5][i % 6] + "deg"); // 폴라로이드처럼 조금씩 다르게 기울임
       var im = el("img");
       im.src = p.url;
       d.appendChild(im);
