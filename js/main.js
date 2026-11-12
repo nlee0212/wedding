@@ -256,7 +256,7 @@
       var badge = b.querySelector(".thumb-badge");
       if (!badge) return;
       var id = b.dataset.id, n = feedData.likes[id] || 0, c = (feedData.comments[id] || []).length;
-      badge.textContent = (n ? "❤️ " + n : "") + (n && c ? "  " : "") + (c ? "💬 " + c : "");
+      badge.textContent = (n ? "🤍 " + n : "") + (n && c ? "  " : "") + (c ? "💬 " + c : "");
       badge.hidden = !(n || c);
     });
   }
