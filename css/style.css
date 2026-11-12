@@ -158,7 +158,6 @@ button { font-family: inherit; color: inherit; }
   text-decoration: none; cursor: pointer; border: 0; transition: transform .15s, box-shadow .2s;
 }
 .pill:active { transform: scale(.97); }
-.pill.grad { color: #fff; background: linear-gradient(90deg, var(--grad1), var(--rose) 55%, var(--grad2)); box-shadow: 0 8px 20px rgba(var(--rose-rgb), .35); }
 .pill.outline { background: #fff; color: var(--rose); border: 1.5px solid var(--rose); padding: 9px 40px; margin-top: 22px; font-size: 14px; }
 .pill.solid { background: var(--rose); color: #fff; box-shadow: 0 6px 16px rgba(var(--rose-rgb), .3); }
 .pill.white { background: #fff; color: var(--ink); box-shadow: 0 2px 12px rgba(0, 0, 0, .12); border: 1px solid #eee; }
@@ -386,15 +385,7 @@ button { font-family: inherit; color: inherit; }
 .save-img { display: block; width: auto; max-width: 100%; max-height: 52svh; margin: 0 auto; border-radius: 10px; box-shadow: var(--card-shadow); -webkit-touch-callout: default; }
 .save-btn { display: inline-block; margin-top: 18px; text-decoration: none; padding: 11px 44px; }
 .save-hint { font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.6; }
-.cal-pick { padding: 30px 20px 20px; }
 .cal-title { color: var(--rose); letter-spacing: .06em; margin: 4px 0 20px; }
-.cal-opt { display: flex; align-items: center; gap: 14px; padding: 13px 18px; margin-top: 10px; border-radius: 14px; background: #fff; border: 1px solid var(--line-soft); box-shadow: var(--card-shadow); text-decoration: none; text-align: left; transition: background .2s; }
-.cal-opt:active { background: var(--rose-softer); }
-.cal-opt::after { content: ""; margin-left: auto; width: 7px; height: 7px; border-right: 1.5px solid var(--rose); border-top: 1.5px solid var(--rose); transform: rotate(45deg); }
-.cal-ic { width: 34px; height: 34px; border-radius: 9px; flex: none; display: flex; align-items: center; justify-content: center; background: var(--rose-soft); box-shadow: 0 0 0 1px rgba(0,0,0,.05); }
-.cal-ic svg { width: 20px; height: 20px; fill: none; stroke: var(--rose-deep); stroke-width: 1.7; stroke-linecap: round; }
-.cal-name { font-size: 15px; color: var(--ink); line-height: 1.35; }
-.cal-name small { display: block; font-size: 12px; color: var(--muted); }
 .modal-later { border: 0; background: none; font-size: 12.5px; color: var(--muted); text-decoration: underline; margin-top: 12px; cursor: pointer; }
 
 /* 사진 올리기 */

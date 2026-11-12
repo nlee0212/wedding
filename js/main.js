@@ -129,36 +129,6 @@
   tick();
   setInterval(tick, 1000);
 
-  var fmt = function (d) { return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); };
-  // 캘린더에 추가: 기본 캘린더(wedding.ics) / Google 캘린더 중 선택
-  // ※ 날짜·장소를 바꾸면 wedding.ics 파일도 같이 고쳐야 함
-  var gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-    "&text=" + encodeURIComponent(W.groom.name + " " + W.bride.name + " 결혼식") +
-    "&dates=" + fmt(wd) + "/" + fmt(new Date(wd.getTime() + 2 * 3600 * 1000)) +
-    "&location=" + encodeURIComponent(W.venue.name + " " + W.venue.hall + ", " + W.venue.address);
-  var isAndroidUA = /Android/i.test(navigator.userAgent), isIOSUA = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  var calBtn = $("#gcal");
-  calBtn.textContent = "＋ 내 캘린더에 추가";
-  calBtn.removeAttribute("target");
-  calBtn.href = "#";
-  // 아이폰·PC: 기본 캘린더(.ics) / Google 캘린더 선택 창, 안드로이드: Google 캘린더로 바로
-  var calModal = $("#calModal"), calIcs = $("#calIcs");
-  $("#calIcsName").textContent = isIOSUA ? "iPhone 캘린더" : isAndroidUA ? "휴대폰 캘린더" : "캘린더 앱";
-  $("#calIcsSub").textContent = isIOSUA ? "기본 캘린더 앱" : isAndroidUA ? "삼성 캘린더 등" : "Outlook · Apple 캘린더 등";
-  // 아이폰 사파리는 download 속성이 있으면 저장만 하므로, 아이폰에서는 바로 열리게
-  if (!isIOSUA) calIcs.setAttribute("download", "김용현이나연_결혼식.ics");
-  $("#calGoogle").href = gcalUrl;
-  var closeCal = function () { calModal.hidden = true; document.body.style.overflow = ""; };
-  if (isAndroidUA) {
-    // 안드로이드: 웹에서 휴대폰 캘린더를 바로 열 수 없어 파일 다운로드가 돼 버림 → 선택 창 없이 Google 캘린더로 바로
-    // (삼성 캘린더도 구글 계정과 연동돼 있으면 같이 보임)
-    calBtn.textContent = "＋ Google 캘린더에 추가";
-    calBtn.href = gcalUrl; calBtn.target = "_blank"; calBtn.rel = "noopener";
-  } else calBtn.addEventListener("click", function (e) { e.preventDefault(); calModal.hidden = false; document.body.style.overflow = "hidden"; });
-  calModal.querySelector("[data-close]").addEventListener("click", closeCal);
-  calModal.addEventListener("click", function (e) { if (e.target === calModal) closeCal(); });
-  [calIcs, $("#calGoogle")].forEach(function (x) { x.addEventListener("click", function () { setTimeout(closeCal, 300); }); });
-
   // ── 갤러리 + 라이트박스 ──
   var g = $("#gallery"), lb = $("#lightbox"), lbImg = lb.querySelector("img"), cur = 0;
   // ?v=4: 사진 파일을 같은 이름으로 바꿔 넣었을 때 휴대폰에 남은 예전 사진 대신 새 사진을 받게 함 (사진을 교체하면 숫자 올리기)

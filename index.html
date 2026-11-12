@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Parisienne&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=20261113w" />
+  <link rel="stylesheet" href="css/style.css?v=20261113x" />
 </head>
 <body>
 <main class="page">
@@ -44,8 +44,8 @@
     <h2 class="spaced">INVITATION</h2>
     <div class="greeting" id="greeting"></div>
     <div class="parents">
-      <p><span data-f="groom.father"></span><b>•</b><span data-f="groom.mother"></span><em>의 <span data-f="groom.relation"></span></em><strong data-f="groom.first"></strong></p>
-      <p><span data-f="bride.father"></span><b>•</b><span data-f="bride.mother"></span><em>의 <span data-f="bride.relation"></span></em><strong data-f="bride.first"></strong></p>
+      <p><span data-f="groom.father"></span><b>•</b><span data-f="groom.mother"></span><em>의 <span data-f="groom.relation"></span></em><strong data-f="groom.name"></strong></p>
+      <p><span data-f="bride.father"></span><b>•</b><span data-f="bride.mother"></span><em>의 <span data-f="bride.relation"></span></em><strong data-f="bride.name"></strong></p>
     </div>
   </section>
 
@@ -61,7 +61,6 @@
       <div><small>SEC</small><b id="cdS">0</b></div>
     </div>
     <p class="dday-text" id="ddayText"></p>
-    <a class="pill grad" id="gcal" target="_blank" rel="noopener">＋ Google Calendar에 추가</a>
   </section>
 
   <!-- 갤러리 -->
@@ -199,21 +198,6 @@
     <p class="save-hint">저장이 안 되면 사진을 <b>길게 눌러</b> '이미지 저장'을 선택해 주세요</p>
   </div>
 </div>
-<div class="modal" id="calModal" hidden>
-  <div class="modal-card cal-pick" role="dialog" aria-modal="true" aria-labelledby="calTitle">
-    <button class="modal-x" type="button" data-close aria-label="닫기">×</button>
-    <p class="eyebrow">CALENDAR</p>
-    <h3 class="cal-title" id="calTitle">캘린더 선택</h3>
-    <a class="cal-opt" id="calIcs" href="wedding.ics">
-      <span class="cal-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
-      <span class="cal-name"><span id="calIcsName">휴대폰 캘린더</span><small id="calIcsSub"></small></span>
-    </a>
-    <a class="cal-opt" id="calGoogle" target="_blank" rel="noopener">
-      <img class="cal-ic" src="images/icons/gcal.png" alt="" width="34" height="34">
-      <span class="cal-name">Google 캘린더<small>구글 계정 캘린더</small></span>
-    </a>
-  </div>
-</div>
 <div class="modal" id="rsvpModal" hidden>
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="rsvpTitle">
     <button class="modal-x" type="button" data-close aria-label="닫기">×</button>
@@ -298,7 +282,7 @@
 </div>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="js/config.js?v=20261113w"></script>
-<script src="js/main.js?v=20261113w"></script>
+<script src="js/config.js?v=20261113x"></script>
+<script src="js/main.js?v=20261113x"></script>
 </body>
 </html>
