@@ -68,6 +68,7 @@ window.WEDDING = {
   petals: false, // 표지 위 떨어지는 꽃잎 효과
   closing: "images/gallery/full/33.jpg", // 엔딩 크레딧 배경 (어두운 사진이 잘 어울림)
   infoImage: "images/gallery/full/r03.jpg", // 예식 정보 이미지 저장에 쓰는 사진
+  infoImageY: 0.45, // 위 사진을 위아래 어디서 자를지 (0 = 맨 위 ~ 1 = 맨 아래). 숫자를 키우면 얼굴이 위로 올라감
   // 엔딩 크레딧 [왼쪽, 오른쪽]
   credits: [
     ["Produced by", "our family"],

@@ -672,7 +672,9 @@
       // 사진 (위쪽 1100px, 가운데 맞춰 자르기)
       var ph = 1200, s = Math.max(Wd / im.naturalWidth, ph / im.naturalHeight);
       var sw = Wd / s, sh = ph / s;
-      x.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) * 0.12, sw, sh, 0, 0, Wd, ph);
+      // infoImageY: 사진을 위아래 어디서 자를지 (0 = 맨 위, 1 = 맨 아래). 얼굴이 사진 칸 가운데쯤 오게 조절
+      var fy = W.infoImageY != null ? W.infoImageY : 0.12;
+      x.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) * fy, sw, sh, 0, 0, Wd, ph);
       // 사진 아래를 배경색으로 자연스럽게 (투명→배경색, 같은 색이라 회색 띠 없음)
       var hx = /^#?([0-9a-f]{6})$/i.exec(bg), rgb = hx ? [0, 2, 4].map(function (k) { return parseInt(hx[1].substr(k, 2), 16); }).join(",") : "252,250,246";
       var gr = x.createLinearGradient(0, ph - 300, 0, ph);
