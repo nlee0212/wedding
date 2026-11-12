@@ -193,7 +193,7 @@
       im.src = thumb(id); im.loading = "lazy"; im.alt = "사진 " + (idx + 1);
       b.appendChild(im);
       b.dataset.id = id;
-      b.appendChild(el("span", "thumb-badge")); // ♥ 3 · 💬 2 (반응이 있을 때만 보임)
+      var badge = el("span", "thumb-badge"); badge.hidden = true; b.appendChild(badge); // ♥ 3 · 💬 2 (반응이 있을 때만 보임)
       // 피드를 한 번도 안 열어 본 하객에게: 첫 사진에 통통 뛰는 하트
       if (idx === 0 && !store.get("feed-seen")) b.appendChild(el("span", "tap-heart", "♥"));
       b.addEventListener("click", function () { openFeed(idx); });
