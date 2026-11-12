@@ -506,7 +506,8 @@ button { font-family: inherit; color: inherit; }
   background: repeating-linear-gradient(90deg, rgba(255,255,255,.18) 0 2px, rgba(0,0,0,.02) 2px 4px), rgba(226, 226, 222, .82);
   box-shadow: 0 1px 1px rgba(0, 0, 0, .06);
 }
-#snapWallMore { margin-top: 22px; }
+.wall-btns { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.wall-btns .pill.outline { margin-top: 0; padding: 9px 22px; }
 .wall-view { position: fixed; inset: 0; z-index: 70; background: rgba(0, 0, 0, .88); display: flex; align-items: center; justify-content: center; padding: 20px; }
 /* 크게 보기: 벽의 폴라로이드와 같은 비율·테이프, 화면에 맞는 크기로 */
 .polaroid-big { --w: min(74vw, 330px, calc((100svh - 140px) * 2 / 3)); width: var(--w); padding: calc(var(--w) * .06) calc(var(--w) * .06) 0; transform: none; cursor: default; box-shadow: 0 6px 24px rgba(0, 0, 0, .35); }

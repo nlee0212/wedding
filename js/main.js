@@ -1116,7 +1116,7 @@
 
   // ── 하객 사진 벽 (폴라로이드) ──
   // 서버 photo_list(최신순, 숨김 제외)를 받아 최근 20장(5장×4줄)을 먼저, 나머지는 '펼쳐보기'로
-  var wall = $("#snapWall"), wallMore = $("#snapWallMore"), wallView = $("#wallView");
+  var wall = $("#snapWall"), wallMore = $("#snapWallMore"), wallLess = $("#snapWallLess"), wallView = $("#wallView");
   var WALL_FIRST = 20, wallItems = [], wallShown = WALL_FIRST, wallLoading = false;
   function renderWall() {
     wall.innerHTML = "";
@@ -1142,10 +1142,11 @@
       });
       wall.appendChild(b);
     });
-    // 펼쳐보기: 누를 때마다 4줄(20장)씩. 버튼엔 이번에 새로 보일 장수, 다 펼치면 '접기'
+    // 펼쳐보기: 누를 때마다 4줄(20장)씩, 버튼엔 이번에 새로 보일 장수. 한 번이라도 펼치면 옆에 '접기'
     var left = wallItems.length - wallShown;
-    wallMore.hidden = wallItems.length <= WALL_FIRST;
-    wallMore.textContent = left > 0 ? "⌄ 펼쳐보기 (" + Math.min(WALL_FIRST, left) + "장 더)" : "⌃ 접기";
+    wallMore.hidden = left <= 0;
+    wallMore.textContent = "⌄ 펼쳐보기 (" + Math.min(WALL_FIRST, left) + "장 더)";
+    wallLess.hidden = wallShown <= WALL_FIRST || wallItems.length <= WALL_FIRST;
   }
   // 사진 고르기: 올린 사람마다 최소 1장은 꼭 보이게 하고, 남은 자리는 전체 사진에서 랜덤.
   // (이름 없이 올린 사진은 '이름 없음' 한 사람으로 묶음) 처음 보이는 칸 안에서는 다시 섞어서,
@@ -1219,14 +1220,13 @@
       .finally(function () { wallLoading = false; });
   }
   wallMore.addEventListener("click", function () {
-    if (wallShown >= wallItems.length) { // 다 펼친 상태 → 접기
-      wallShown = WALL_FIRST;
-      renderWall();
-      $("#snapSec").scrollIntoView({ behavior: "smooth" });
-    } else {
-      wallShown = Math.min(wallItems.length, wallShown + WALL_FIRST);
-      renderWall();
-    }
+    wallShown = Math.min(wallItems.length, wallShown + WALL_FIRST);
+    renderWall();
+  });
+  wallLess.addEventListener("click", function () {
+    wallShown = WALL_FIRST;
+    renderWall();
+    $("#snapSec").scrollIntoView({ behavior: "smooth" });
   });
   var closeWallView = function () { wallView.hidden = true; document.body.style.overflow = ""; };
   wallView.querySelector(".lb-close").addEventListener("click", closeWallView);
