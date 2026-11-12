@@ -64,10 +64,10 @@ window.WEDDING = {
 
   // 포인트 색: "film"(필름 웜톤) / "paper"(종이 청첩장) / "sage"(세이지) / "rose"(더스티 로즈)
   theme: "film",
-  cover: "images/gallery/full/13.jpg",
+  cover: "images/gallery/full/r01.jpg",
   petals: false, // 표지 위 떨어지는 꽃잎 효과
   closing: "images/gallery/full/33.jpg", // 엔딩 크레딧 배경 (어두운 사진이 잘 어울림)
-  infoImage: "images/gallery/full/22.jpg", // 예식 정보 이미지 저장에 쓰는 사진
+  infoImage: "images/gallery/full/r03.jpg", // 예식 정보 이미지 저장에 쓰는 사진
   // 엔딩 크레딧 [왼쪽, 오른쪽]
   credits: [
     ["Produced by", "our family"],
@@ -82,7 +82,7 @@ window.WEDDING = {
   // 테마를 추가·삭제하거나 사진 순서를 바꾸려면 이 목록만 고치면 됩니다.
   // '전체' 칩은 각 테마에서 한 장씩 번갈아 섞어 보여 주고, 9장 넘으면 '펼치기' 버튼이 생김
   gallery: [
-    { emoji: "🤍", name: "키노스튜디오", photos: ["01", "02", "03", "04", "05", "06", "07", "09", "10", "11", "12", "13", "14", "15", "16", "b01", "b02", "b03", "b04"] },
+    { emoji: "🤍", name: "키노스튜디오", photos: ["r01", "r02", "r03", "r04", "01", "02", "03", "04", "05", "06", "07", "09", "10", "11", "12", "13", "14", "15", "16", "b01", "b02", "b03", "b04"] },
     { emoji: "🌿", name: "노을공원", photos: ["08", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "b05", "b06", "b07"] },
     { emoji: "🌙", name: "동작대교", photos: ["28", "29", "30", "31", "32", "33", "34", "35", "b09", "b10", "b11", "b14", "b15"] },
     { emoji: "🏮", name: "타이베이", photos: ["tw01", "tw02", "tw03", "tw04", "tw05", "tw06", "tw07", "tw08", "tw09", "tw10", "tw11", "tw12", "tw13", "tw14", "tw15"] },
