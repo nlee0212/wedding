@@ -1039,6 +1039,23 @@
   snapModal.querySelector("[data-close]").addEventListener("click", closeSnap);
   snapModal.addEventListener("click", function (e) { if (e.target === snapModal) closeSnap(); });
 
+  // 비슷한 사진 비교용 '비교값': 64×64 로 줄인 뒤 4×4 칸 평균 밝기 → 16×16(256바이트) → base64
+  function lookSig(img) {
+    try {
+      var c = document.createElement("canvas"); c.width = c.height = 64;
+      var g = c.getContext("2d"); g.drawImage(img, 0, 0, 64, 64);
+      var px = g.getImageData(0, 0, 64, 64).data, s = "";
+      for (var by = 0; by < 16; by++) for (var bx = 0; bx < 16; bx++) {
+        var t = 0;
+        for (var y = by * 4; y < by * 4 + 4; y++) for (var x = bx * 4; x < bx * 4 + 4; x++) {
+          var i = (y * 64 + x) * 4; t += 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+        }
+        s += String.fromCharCode(Math.round(t / 16));
+      }
+      return btoa(s);
+    } catch (e) { return ""; }
+  }
+
   // 휴대폰 원본은 5~10MB 라 그대로 보내면 느리고 한도에 걸림 → 긴 변 2400px JPEG 로 줄여서 보냄
   function shrink(file) {
     return new Promise(function (resolve, reject) {
@@ -1054,7 +1071,7 @@
           c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
           return c.toDataURL("image/jpeg", q).split(",")[1];
         };
-        resolve({ data: draw(MAX_EDGE, 0.88), thumb: draw(600, 0.82) });
+        resolve({ data: draw(MAX_EDGE, 0.88), thumb: draw(600, 0.82), sig: lookSig(img) });
       };
       img.onerror = function () { reject(new Error("decode")); };
       img.src = URL.createObjectURL(file);
@@ -1085,7 +1102,7 @@
       var p = queue[n];
       shrink(p.file)
         .then(function (img) {
-          var body = { type: "photo", uploader: uploader, filename: p.file.name, data: img.data, thumb: img.thumb };
+          var body = { type: "photo", uploader: uploader, filename: p.file.name, data: img.data, thumb: img.thumb, sig: img.sig };
           return callScript(body).catch(function () { return callScript(body); });
         })
         .then(function () { p.state = "done"; okCount++; }, function () { p.state = "fail"; })
@@ -1162,11 +1179,44 @@
     for (var i = 0; i < seq.length; i += WALL_FIRST) out = out.concat(shuffle(seq.slice(i, i + WALL_FIRST)));
     return out;
   }
+  // 거의 같은 사진(연사 등)은 한 장만: 같은 사람이 10분 안에 올린 사진끼리만 비교해서
+  // (다른 하객이 같은 장면을 찍은 사진은 그대로 둠) 최근 것을 남기고 닮은 것은 뺌.
+  // 닮음 = 16×16 밝기의 상관계수(위아래·좌우 2칸까지 어긋남 허용) 0.80 이상. 비교값 없는 사진은 그대로.
+  var LOOKALIKE = 0.8, SAME_BATCH_MS = 10 * 60 * 1000;
+  function sigBytes(b64) {
+    try { var s = atob(b64); if (s.length !== 256) return null; var a = new Array(256); for (var i = 0; i < 256; i++) a[i] = s.charCodeAt(i); return a; } catch (e) { return null; }
+  }
+  function lookAlike(a, b) {
+    var best = -1;
+    for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) {
+      var n = 0, sa = 0, sb = 0, saa = 0, sbb = 0, sab = 0;
+      for (var y = Math.max(0, -dy); y < Math.min(16, 16 - dy); y++) for (var x = Math.max(0, -dx); x < Math.min(16, 16 - dx); x++) {
+        var p = a[y * 16 + x], q = b[(y + dy) * 16 + x + dx];
+        n++; sa += p; sb += q; saa += p * p; sbb += q * q; sab += p * q;
+      }
+      var va = saa - sa * sa / n, vb = sbb - sb * sb / n;
+      var r = (sab - sa * sb / n) / Math.sqrt(va * vb + 1e-9);
+      if (r > best) best = r;
+    }
+    return best >= LOOKALIKE;
+  }
+  function dropLookalikes(items) {
+    var kept = [];
+    items.slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).forEach(function (it) {
+      var sg = it.sig ? sigBytes(it.sig) : null;
+      var who = (it.name || "").trim();
+      var dup = sg && kept.some(function (k) {
+        return k.sg && k.who === who && Math.abs((k.it.ts || 0) - (it.ts || 0)) <= SAME_BATCH_MS && lookAlike(sg, k.sg);
+      });
+      if (!dup) kept.push({ it: it, sg: sg, who: who });
+    });
+    return kept.map(function (k) { return k.it; });
+  }
   function loadWall() {
     if (!W.appsScriptUrl || wallLoading) return;
     wallLoading = true;
     callScript({ type: "photo_list" })
-      .then(function (res) { wallItems = spreadByUploader(res.items || []); renderWall(); })
+      .then(function (res) { wallItems = spreadByUploader(dropLookalikes(res.items || [])); renderWall(); })
       .catch(function () {})
       .finally(function () { wallLoading = false; });
   }
