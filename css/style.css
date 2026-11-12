@@ -148,7 +148,7 @@ button { font-family: inherit; color: inherit; }
 .countdown small { font-size: 10px; letter-spacing: .08em; color: var(--muted); }
 .countdown b { font-size: 26px; font-weight: 700; line-height: 1.3; font-variant-numeric: tabular-nums; }
 .countdown > span { font-size: 22px; line-height: 1.6; }
-.dday-text { margin: 16px 0 26px; font-size: 14px; }
+.dday-text { margin: 16px 0 0; font-size: 14px; }
 .dday-text em { font-style: normal; color: var(--pink); }
 
 /* 버튼 */
