@@ -107,7 +107,7 @@ window.WEDDING = {
     bride: [
       { role: "신부", name: "이나연", bank: "하나은행", number: "620-185709-695" },
       { role: "아버지", name: "이근수", bank: "국민은행", number: "523602-01-009037" },
-      { role: "어머니", name: "윤이경", bank: "TEMP은행", number: "000-0000-0000-06" },
+      { role: "어머니", name: "윤이경", bank: "신한은행", number: "366-06-212567" },
     ],
   },
 
