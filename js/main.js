@@ -252,7 +252,7 @@
 
   function loadFeed() {
     if (!W.appsScriptUrl) return;
-    callScript({ type: "feed_get" }).then(function (res) {
+    callScript({ type: "feed_get", device: deviceId }).then(function (res) {
       // 구글 시트는 "01" 같은 사진 번호를 숫자 1로 바꿔 저장함 → "1"로 돌아온 키를 원래 ID("01")로 되돌림
       var byNum = {};
       themes.forEach(function (t) { t.photos.forEach(function (id) { if (/^\d+$/.test(id)) byNum[String(Number(id))] = id; }); });
@@ -298,6 +298,29 @@
       var li = el("li", c.pending ? "pending" : null);
       li.appendChild(el("b", null, c.name));
       li.append(" " + c.text);
+      // 이 기기에서 쓴 댓글에만 삭제 버튼 (서버가 mine:true 로 알려 줌)
+      if (c.mine && c.id && !c.pending) {
+        var del = el("button", "cmt-del", "삭제");
+        del.type = "button";
+        del.setAttribute("aria-label", "내 댓글 삭제");
+        del.addEventListener("click", function () {
+          if (!confirm("이 댓글을 삭제할까요?")) return;
+          del.disabled = true;
+          callScript({ type: "feed_comment_delete", id: c.id, device: deviceId })
+            .then(function () {
+              var i = list.indexOf(c);
+              if (i >= 0) list.splice(i, 1);
+              updatePost(post);
+              updateBadges();
+              toast("댓글이 삭제되었습니다");
+            })
+            .catch(function (er) {
+              del.disabled = false;
+              toast(/not_owner/.test(er && er.message) ? "이 기기에서 쓴 댓글만 지울 수 있어요" : "삭제하지 못했어요");
+            });
+        });
+        li.appendChild(del);
+      }
       ul.appendChild(li);
     });
   }
@@ -388,7 +411,7 @@
       list.push(mine);
       tx.value = "";
       keepPlace(function () { post.classList.add("all"); updatePost(post); updateBadges(); });
-      callScript({ type: "feed_comment", id: id, name: name, text: text })
+      callScript({ type: "feed_comment", id: id, name: name, text: text, device: deviceId })
         .then(function (res) {
           var i = list.indexOf(mine);
           if (i >= 0) list[i] = res.item || { name: name, text: text };
@@ -1022,12 +1045,16 @@
       var img = new Image();
       img.onload = function () {
         URL.revokeObjectURL(img.src);
-        var s = Math.min(1, MAX_EDGE / Math.max(img.naturalWidth, img.naturalHeight));
-        var c = document.createElement("canvas");
-        c.width = Math.round(img.naturalWidth * s);
-        c.height = Math.round(img.naturalHeight * s);
-        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-        resolve(c.toDataURL("image/jpeg", 0.88).split(",")[1]);
+        // 원본용(긴 변 2400px)과 사진 벽 공개용 썸네일(긴 변 600px)을 같이 만듦
+        var draw = function (edge, q) {
+          var s = Math.min(1, edge / Math.max(img.naturalWidth, img.naturalHeight));
+          var c = document.createElement("canvas");
+          c.width = Math.round(img.naturalWidth * s);
+          c.height = Math.round(img.naturalHeight * s);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          return c.toDataURL("image/jpeg", q).split(",")[1];
+        };
+        resolve({ data: draw(MAX_EDGE, 0.88), thumb: draw(600, 0.82) });
       };
       img.onerror = function () { reject(new Error("decode")); };
       img.src = URL.createObjectURL(file);
@@ -1052,13 +1079,14 @@
         renderSnaps();
         if (failed) snapErr.textContent = failed + "장을 올리지 못했어요. 다시 눌러 주세요.";
         else { closeSnap(); toast("사진 " + okCount + "장이 전달되었습니다. 감사합니다 ♥"); }
+        if (okCount) loadWall(); // 방금 올린 사진이 벽 맨 앞에 보이게
         return;
       }
       var p = queue[n];
       shrink(p.file)
-        .then(function (b64) {
-          return callScript({ type: "photo", uploader: uploader, filename: p.file.name, data: b64 })
-            .catch(function () { return callScript({ type: "photo", uploader: uploader, filename: p.file.name, data: b64 }); });
+        .then(function (img) {
+          var body = { type: "photo", uploader: uploader, filename: p.file.name, data: img.data, thumb: img.thumb };
+          return callScript(body).catch(function () { return callScript(body); });
         })
         .then(function () { p.state = "done"; okCount++; }, function () { p.state = "fail"; })
         .then(function () {
@@ -1070,6 +1098,54 @@
         });
     })();
   });
+
+  // ── 하객 사진 벽 (폴라로이드) ──
+  // 서버 photo_list(최신순, 숨김 제외)를 받아 최근 30장을 먼저, 나머지는 '펼쳐보기'로
+  var wall = $("#snapWall"), wallMore = $("#snapWallMore"), wallView = $("#wallView");
+  var WALL_FIRST = 30, wallItems = [], wallShown = WALL_FIRST, wallLoading = false;
+  function renderWall() {
+    wall.innerHTML = "";
+    wallItems.slice(0, wallShown).forEach(function (it, i) {
+      var b = el("button", "polaroid");
+      b.type = "button";
+      // 사진마다 살짝 다른 기울기 (id 로 정해서 새로고침해도 같은 모양)
+      var h = 0;
+      for (var k = 0; k < it.id.length; k++) h = (h * 31 + it.id.charCodeAt(k)) % 997;
+      b.style.setProperty("--tilt", ((h % 7) - 3) * 0.9 + "deg");
+      var im = el("img");
+      im.src = it.thumb; im.loading = i < 6 ? "eager" : "lazy"; im.alt = (it.name || "하객") + "님이 올린 사진";
+      im.referrerPolicy = "no-referrer";
+      im.addEventListener("error", function () { b.hidden = true; }); // 깨진 썸네일은 숨김
+      b.appendChild(im);
+      b.appendChild(el("span", "polaroid-name", it.name ? "from. " + it.name : ""));
+      b.addEventListener("click", function () {
+        wallView.querySelector("img").src = it.thumb;
+        wallView.querySelector("figcaption").textContent = it.name ? "from. " + it.name : "";
+        wallView.hidden = false;
+        document.body.style.overflow = "hidden";
+      });
+      wall.appendChild(b);
+    });
+    var left = wallItems.length - wallShown;
+    wallMore.hidden = left <= 0;
+    if (left > 0) wallMore.textContent = "⌄ 펼쳐보기 (" + left + "장 더)";
+  }
+  function loadWall() {
+    if (!W.appsScriptUrl || wallLoading) return;
+    wallLoading = true;
+    callScript({ type: "photo_list" })
+      .then(function (res) { wallItems = res.items || []; renderWall(); })
+      .catch(function () {})
+      .finally(function () { wallLoading = false; });
+  }
+  wallMore.addEventListener("click", function () { wallShown = Math.max(WALL_FIRST, wallItems.length); renderWall(); });
+  var closeWallView = function () { wallView.hidden = true; document.body.style.overflow = ""; };
+  wallView.querySelector(".lb-close").addEventListener("click", closeWallView);
+  wallView.addEventListener("click", function (e) { if (e.target === wallView) closeWallView(); });
+  if (W.photoUpload && "IntersectionObserver" in window) {
+    var wio = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { loadWall(); wio.disconnect(); } }, { rootMargin: "500px" });
+    wio.observe($("#snapSec"));
+  } else if (W.photoUpload) loadWall();
 
   // ── 방명록 (말풍선, 구글 시트 '방명록' 탭) ──
   if (W.appsScriptUrl && W.guestbook !== false) {

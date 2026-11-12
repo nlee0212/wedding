@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Parisienne&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=20261112zx" />
+  <link rel="stylesheet" href="css/style.css?v=20261113a" />
 </head>
 <body>
 <main class="page">
@@ -148,6 +148,9 @@
     <button class="pill white" id="snapBtn" type="button">사진 올리기</button>
     <input type="file" id="snapInput" accept="image/*" multiple hidden />
     <p class="desc small">오늘 찍어 주신 신랑 신부의 모습을<br />여기서 바로 공유하실 수 있습니다!</p>
+    <!-- 하객 사진 벽 (폴라로이드): 최근 30장 + 펼쳐보기 -->
+    <div class="wall" id="snapWall" aria-label="하객들이 올린 사진"></div>
+    <button class="pill outline" id="snapWallMore" type="button" hidden></button>
   </section>
 
   <!-- 마무리 -->
@@ -276,6 +279,12 @@
   <div id="feedList"></div>
 </div>
 
+<!-- 하객 사진 크게 보기 -->
+<div class="wall-view" id="wallView" hidden>
+  <button class="lb-close" type="button" aria-label="닫기">×</button>
+  <figure><img alt="" /><figcaption></figcaption></figure>
+</div>
+
 <div class="lightbox" id="lightbox" hidden>
   <button class="lb-close" type="button" aria-label="닫기">×</button>
   <button class="lb-prev" type="button" aria-label="이전">‹</button>
@@ -285,7 +294,7 @@
 </div>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="js/config.js?v=20261112zx"></script>
-<script src="js/main.js?v=20261112zx"></script>
+<script src="js/config.js?v=20261113a"></script>
+<script src="js/main.js?v=20261113a"></script>
 </body>
 </html>
