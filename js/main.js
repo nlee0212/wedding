@@ -194,8 +194,6 @@
       b.appendChild(im);
       b.dataset.id = id;
       var badge = el("span", "thumb-badge"); badge.hidden = true; b.appendChild(badge); // ♥ 3 · 💬 2 (반응이 있을 때만 보임)
-      // 피드를 한 번도 안 열어 본 하객에게: 첫 사진에 통통 뛰는 하트
-      if (idx === 0 && !store.get("feed-seen")) b.appendChild(el("span", "tap-heart", "♥"));
       b.addEventListener("click", function () { openFeed(idx); });
       g.appendChild(b);
     });
@@ -368,7 +366,6 @@
   }
   function openFeed(idx) {
     store.set("feed-seen", "1");
-    $$(".tap-heart").forEach(function (h) { h.parentNode.removeChild(h); });
     feedList.innerHTML = "";
     curIds.forEach(function (id, i) { feedList.appendChild(buildPost(id, i, curIds.length)); });
     feedEl.hidden = false;
