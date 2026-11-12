@@ -779,7 +779,7 @@
 
   // ── 배경음악 ──
   // 브라우저는 소리 있는 자동재생을 막기 때문에, 바로 재생을 시도하고
-  // 막히면 하객이 화면을 처음 터치하는 순간(참석 팝업 등) 재생을 시작한다.
+  // 막히면 하객이 화면의 빈 곳을 처음 터치하는 순간 재생을 시작한다 (사진·버튼 등 의도가 있는 누름은 제외).
   var audio = $("#bgm"), bgmBtn = $("#bgmBtn"), userMuted = false;
   var bannerShown = false;
   var bgmHint = $("#bgmHint");
@@ -799,13 +799,14 @@
     var pr = audio.play();
     return pr && pr.then ? pr.then(function () { setPlaying(true); return true; }, function () { return false; }) : Promise.resolve(true);
   }
-  var unlockEvents = ["pointerdown", "touchend", "click", "keydown"];
+  var unlockEvents = ["pointerdown", "touchend", "click"];
+  var INTENT = "a, button, input, textarea, select, label, summary, [role='button'], [role='tab'], #kmap, #gallery, #feed, #lightbox, .modal, .acc-card, .chips";
   function stopUnlock() { unlockEvents.forEach(function (ev) { document.removeEventListener(ev, unlock, true); }); }
   function unlock(e) {
     // 음악 버튼을 누른 경우는 버튼이 직접 처리 (여기서도 재생하면 버튼이 곧바로 다시 꺼 버림)
     if (e && e.target && bgmBtn.contains(e.target)) return;
-    // 지도를 탭한 건 '지도 움직이기'용이라 음악은 켜지 않음
-    if (e && e.target && e.target.closest && e.target.closest("#kmap")) return;
+    // 의도가 있는 누름(사진·버튼·링크·입력칸·지도·팝업 등)에는 음악을 켜지 않음. 빈 곳을 터치했을 때만 켬
+    if (e && e.target && e.target.closest && e.target.closest(INTENT)) return;
     tryPlay().then(function (ok) {
       if (ok || userMuted) stopUnlock();
     });
