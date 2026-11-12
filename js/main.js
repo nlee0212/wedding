@@ -1139,6 +1139,11 @@
     for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
     return a;
   }
+  // 라운드 로빈 + 최신성 우선:
+  //  - 1바퀴: 모든 사람 1장씩 → 2바퀴: 각자 2번째 … (두 사람이 비슷하게 올리면 정확히 반반)
+  //  - 각 사람 사진은 최근에 올린 것부터
+  //  - 한 바퀴 안에서는 가장 최근에 올린 사람부터 (사람이 칸보다 많으면 최근 사람이 먼저 자리를 받음)
+  //  - 화면에선 페이지(20장)마다 섞어서 같은 사람 사진이 줄지어 붙지 않게
   function spreadByUploader(items) {
     var groups = {}, keys = [];
     items.forEach(function (it) {
@@ -1146,18 +1151,16 @@
       if (!groups[k]) { groups[k] = []; keys.push(k); }
       groups[k].push(it);
     });
-    var picked = [], rest = [];
-    keys.forEach(function (k) {
-      var g = shuffle(groups[k].slice());
-      picked.push(g[0]);              // 사람마다 1장 보장
-      rest = rest.concat(g.slice(1));
-    });
-    shuffle(picked);
-    shuffle(rest);                    // 나머지는 사람 구분 없이 전체 랜덤
-    var room = Math.max(0, WALL_FIRST - picked.length);
-    var first = shuffle(picked.slice(0, WALL_FIRST).concat(rest.slice(0, room)));
-    // 사람이 WALL_FIRST 보다 많으면 보장분 중 남는 것은 펼쳐보기 쪽으로
-    return first.concat(shuffle(picked.slice(WALL_FIRST).concat(rest.slice(room))));
+    keys.forEach(function (k) { groups[k].sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }); });
+    keys.sort(function (a, b) { return (groups[b][0].ts || 0) - (groups[a][0].ts || 0); });
+    var seq = [];
+    for (var round = 0, more = true; more; round++) {
+      more = false;
+      keys.forEach(function (k) { if (groups[k][round]) { seq.push(groups[k][round]); more = true; } });
+    }
+    var out = [];
+    for (var i = 0; i < seq.length; i += WALL_FIRST) out = out.concat(shuffle(seq.slice(i, i + WALL_FIRST)));
+    return out;
   }
   function loadWall() {
     if (!W.appsScriptUrl || wallLoading) return;

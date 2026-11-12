@@ -500,20 +500,13 @@ button { font-family: inherit; color: inherit; }
 .polaroid img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #ece7df; } /* 불러오는 동안 연한 베이지 */
 /* 아래 여백: 사진 칸 너비(카드의 88%) 기준 28/88 → 가로:세로 = 88:28 */
 .polaroid-name { width: 100%; aspect-ratio: 88 / 28; display: flex; align-items: center; justify-content: center; font-family: var(--sans); font-size: 10.5px; letter-spacing: .02em; color: #3a3a3a; overflow: hidden; white-space: nowrap; } /* 이름: 청첩장 본문 글씨체(을유1945) */
-/* 마스킹 테이프 (오른쪽 위, 왼쪽 아래): 길이 = 카드 너비의 40%, 두께 = 길이의 1/4 */
-.polaroid::before, .polaroid::after {
-  content: ""; position: absolute; width: 40%; aspect-ratio: 4 / 1; pointer-events: none;
+/* 마스킹 테이프: 위쪽 가운데 한 장 (길이 = 카드 너비의 40%, 두께 = 길이의 1/4, 반쯤 카드 밖으로) */
+.polaroid::before {
+  content: ""; position: absolute; top: 0; left: 50%; width: 40%; aspect-ratio: 4 / 1; pointer-events: none;
+  transform: translate(-50%, -55%) rotate(-2deg);
   background: repeating-linear-gradient(90deg, rgba(255,255,255,.18) 0 2px, rgba(0,0,0,.02) 2px 4px), rgba(226, 226, 222, .82);
   box-shadow: 0 1px 1px rgba(0, 0, 0, .06);
 }
-.polaroid::before { top: -2%; right: -12%; transform: rotate(40deg); }
-.polaroid::after { bottom: 1%; left: -12%; transform: rotate(40deg); }
-  content: ""; position: absolute; width: 44%; height: 6px; pointer-events: none;
-  background: repeating-linear-gradient(90deg, rgba(255,255,255,.18) 0 2px, rgba(0,0,0,.02) 2px 4px), rgba(226, 226, 222, .82);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, .06);
-}
-.polaroid::before { top: -2px; right: -13%; transform: rotate(38deg); }
-.polaroid::after { bottom: -2px; left: -15%; transform: rotate(40deg); }
 #snapWallMore { margin-top: 22px; }
 .wall-view { position: fixed; inset: 0; z-index: 70; background: rgba(0, 0, 0, .88); display: flex; align-items: center; justify-content: center; padding: 20px; }
 /* 크게 보기: 벽의 폴라로이드와 같은 비율·테이프, 화면에 맞는 크기로 */
@@ -523,3 +516,5 @@ button { font-family: inherit; color: inherit; }
 .wall-view .lb-close { position: absolute; top: 12px; right: 8px; background: none; border: 0; color: #fff; font-size: 38px; cursor: pointer; }
 .cmt-del { border: 0; background: none; color: var(--muted); font-family: var(--sans); font-size: 11.5px; margin-left: 6px; padding: 0 2px; cursor: pointer; text-decoration: underline; }
 .cmt-del:disabled { opacity: .5; }
+.snap-behind { margin-top: 18px; font-size: 13px; line-height: 1.8; color: var(--rose-deep); }
+.snap-behind:empty { display: none; }
