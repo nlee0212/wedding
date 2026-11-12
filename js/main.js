@@ -807,6 +807,8 @@
   function unlock(e) {
     // 음악 버튼을 누른 경우는 버튼이 직접 처리 (여기서도 재생하면 버튼이 곧바로 다시 꺼 버림)
     if (e && e.target && bgmBtn.contains(e.target)) return;
+    // 지도를 탭한 건 '지도 움직이기'용이라 음악은 켜지 않음
+    if (e && e.target && e.target.closest && e.target.closest("#kmap")) return;
     tryPlay().then(function (ok) {
       if (ok || userMuted) stopUnlock();
     });
