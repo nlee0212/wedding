@@ -472,10 +472,24 @@
     var draw = function (lat, lng) {
       kmapEl.hidden = false;
       var pos = new km.LatLng(lat, lng);
-      // 확대·축소(두 손가락, +/− 버튼)만 되고 끌어서 움직이기는 막음. 확대해도 예식장이 늘 가운데
-      var map = new km.Map(kmapEl, { center: pos, level: 3, draggable: false, scrollwheel: false });
+      // 휴대폰: 처음 지도에 닿는 손가락(페이지를 스크롤하다 스친 것)은 무시하고, 그다음부터는 끌어서 움직일 수 있음
+      // 지도가 화면 밖으로 나가면 다시 잠금. 잠긴 동안에는 확대·축소해도 예식장이 가운데
+      var map = new km.Map(kmapEl, { center: pos, level: 3, draggable: !isMobile, scrollwheel: false });
       map.addControl(new km.ZoomControl(), km.ControlPosition.RIGHT);
-      km.event.addListener(map, "zoom_changed", function () { map.setCenter(pos); });
+      var unlocked = !isMobile;
+      km.event.addListener(map, "zoom_changed", function () { if (!unlocked) map.setCenter(pos); });
+      var tip = el("div", "kmap-tip", "이제 지도를 움직일 수 있어요");
+      kmapEl.appendChild(tip);
+      kmapEl.addEventListener("touchend", function () {
+        if (unlocked) return;
+        unlocked = true; map.setDraggable(true);
+        tip.classList.add("show"); setTimeout(function () { tip.classList.remove("show"); }, 1600);
+      }, { passive: true });
+      if (isMobile && "IntersectionObserver" in window) {
+        new IntersectionObserver(function (es) {
+          if (!es[0].isIntersecting && unlocked) { unlocked = false; map.setDraggable(false); map.setCenter(pos); }
+        }).observe(kmapEl);
+      }
       new km.Marker({ position: pos, map: map });
       var lab = el("div", "kmap-label", v.name);
       new km.CustomOverlay({ position: pos, content: lab, yAnchor: 0.5, map: map });

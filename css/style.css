@@ -213,6 +213,9 @@ button { font-family: inherit; color: inherit; }
 
 /* 오시는 길 카드 */
 .kmap { width: 100%; height: 240px; border-bottom: 1px solid #f1f1f1; }
+.kmap { position: relative; }
+.kmap-tip { position: absolute; z-index: 20; left: 50%; bottom: 12px; transform: translateX(-50%); background: rgba(40, 40, 40, .7); color: #fff; font-size: 12px; padding: 5px 12px; border-radius: 999px; white-space: nowrap; opacity: 0; transition: opacity .3s; pointer-events: none; }
+.kmap-tip.show { opacity: 1; }
 .kmap-label { background: #fff; border: 1px solid rgba(var(--rose-rgb), .5); border-radius: 999px; padding: 4px 11px; font-size: 12px; font-weight: 700; color: var(--ink); box-shadow: 0 2px 8px rgba(0, 0, 0, .12); white-space: nowrap; transform: translateY(-46px); }
 .way-card { background: #fff; border-radius: 16px; box-shadow: var(--card-shadow); border: 1px solid #f1f1f1; overflow: hidden; text-align: left; }
 .way-rows { padding: 6px 18px; }
