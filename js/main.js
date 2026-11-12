@@ -560,8 +560,6 @@
         }
       }
       new km.Marker({ position: pos, map: map });
-      var lab = el("div", "kmap-label", v.name);
-      new km.CustomOverlay({ position: pos, content: lab, yAnchor: 0.5, map: map });
       map.relayout(); map.setCenter(pos);
     };
     if (hasXY) return draw(Number(v.lat), Number(v.lng));
