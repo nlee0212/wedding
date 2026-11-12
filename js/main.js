@@ -161,13 +161,15 @@
 
   // ── 갤러리 + 라이트박스 ──
   var g = $("#gallery"), lb = $("#lightbox"), lbImg = lb.querySelector("img"), cur = 0;
-  var full = function (id) { return /\//.test(id) ? id : "images/gallery/full/" + id + ".jpg"; };
-  var thumb = function (id) { return /\//.test(id) ? id : "images/gallery/thumb/" + id + ".jpg?sq=2"; }; // ?sq=2: 정사각형 썸네일로 바뀐 뒤 예전 캐시 무시
+  // ?v=3: 사진 파일을 같은 이름으로 바꿔 넣었을 때 휴대폰에 남은 예전 사진 대신 새 사진을 받게 함 (사진을 교체하면 숫자 올리기)
+  var full = function (id) { return /\//.test(id) ? id : "images/gallery/full/" + id + ".jpg?v=3"; };
+  var thumb = function (id) { return /\//.test(id) ? id : "images/gallery/thumb/" + id + ".jpg?v=3"; };
   // 테마 목록 (예전처럼 번호 배열만 넣어도 동작)
   var themes = (W.gallery || []).length && typeof W.gallery[0] === "string"
     ? [{ emoji: "", name: "전체", photos: W.gallery }]
     : (W.gallery || []);
-  // 각 테마 안에서는 파일명 순서로 정렬 (01, 02 … 16, b01 …, r01 …, tw01 …). 숫자는 크기대로(2 < 10)
+  // 각 테마 안에서는 파일명 순서로 정렬 (01 … 11, 11a, 12 … 15, 15a, 16, 16a, b01 …, tw01 …). 숫자는 크기대로(2 < 10)
+  // 특정 사진 바로 뒤에 넣고 싶으면 파일명 끝에 a, b 를 붙이면 됨 (예: 15a → 15 바로 다음)
   themes.forEach(function (t) {
     t.photos = t.photos.slice().sort(function (a, b) { return a.localeCompare(b, "en", { numeric: true }); });
   });
