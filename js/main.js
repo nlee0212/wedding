@@ -545,7 +545,7 @@
       info.appendChild(num);
       var btn = el("button", "copy-btn", "복사");
       btn.type = "button";
-      btn.addEventListener("click", function () { copy(a.bank + " " + a.number, a.role + " " + a.name + "님 계좌번호가 복사되었습니다"); });
+      btn.addEventListener("click", function () { copy(a.bank + " " + a.number.replace(/\D/g, "") + " " + a.name, a.role + " " + a.name + "님 계좌번호가 복사되었습니다"); });
       r.appendChild(info);
       r.appendChild(btn);
       inner.appendChild(r);
