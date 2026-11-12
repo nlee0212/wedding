@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Parisienne&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=20261112u" />
+  <link rel="stylesheet" href="css/style.css?v=20261112v" />
 </head>
 <body>
 <main class="page">
@@ -182,6 +182,16 @@
 <div class="bgm-banner" id="bgmBanner" role="status">배경음악이 재생됩니다 · 오른쪽 위 버튼으로 끌 수 있어요</div>
 
 <!-- 참석 여부 팝업 -->
+<div class="modal" id="saveModal" hidden>
+  <div class="modal-card save-card" role="dialog" aria-modal="true" aria-labelledby="saveTitle">
+    <button class="modal-x" type="button" data-close aria-label="닫기">×</button>
+    <p class="eyebrow">SAVE</p>
+    <h3 class="cal-title" id="saveTitle">예식 정보 이미지</h3>
+    <img class="save-img" id="saveImg" alt="예식 정보 이미지">
+    <a class="pill solid save-btn" id="saveBtn">갤러리에 저장</a>
+    <p class="save-hint">저장이 안 되면 사진을 <b>길게 눌러</b> '이미지 저장'을 선택해 주세요</p>
+  </div>
+</div>
 <div class="modal" id="calModal" hidden>
   <div class="modal-card cal-pick" role="dialog" aria-modal="true" aria-labelledby="calTitle">
     <button class="modal-x" type="button" data-close aria-label="닫기">×</button>
@@ -274,7 +284,7 @@
 </div>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="js/config.js?v=20261112u"></script>
-<script src="js/main.js?v=20261112u"></script>
+<script src="js/config.js?v=20261112v"></script>
+<script src="js/main.js?v=20261112v"></script>
 </body>
 </html>
