@@ -167,6 +167,10 @@
   var themes = (W.gallery || []).length && typeof W.gallery[0] === "string"
     ? [{ emoji: "", name: "전체", photos: W.gallery }]
     : (W.gallery || []);
+  // 각 테마 안에서는 파일명 순서로 정렬 (01, 02 … 16, b01 …, r01 …, tw01 …). 숫자는 크기대로(2 < 10)
+  themes.forEach(function (t) {
+    t.photos = t.photos.slice().sort(function (a, b) { return a.localeCompare(b, "en", { numeric: true }); });
+  });
   // '전체' = 테마 순서대로 이어 붙이기 (섞지 않음)
   var mixed = [];
   themes.forEach(function (t) { mixed = mixed.concat(t.photos); });
