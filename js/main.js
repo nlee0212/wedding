@@ -1117,7 +1117,7 @@
       im.referrerPolicy = "no-referrer";
       im.addEventListener("error", function () { b.hidden = true; }); // 깨진 썸네일은 숨김
       b.appendChild(im);
-      var label = it.name ? "📸 " + it.name : ""; // 아래 여백: 📸 이름 (이름 없으면 비움)
+      var label = ""; // 이름은 표시하지 않음 (아래 여백만)
       b.appendChild(el("span", "polaroid-name", label));
       b.addEventListener("click", function () {
         wallView.querySelector("img").src = it.thumb;
