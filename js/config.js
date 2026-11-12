@@ -89,7 +89,7 @@ window.WEDDING = {
   ],
 
   // 배경음악. mp3 파일을 audio/ 폴더에 넣고 경로를 적으세요. 비워 두면 음악 버튼 숨김
-  bgm: "audio/bgm.m4a", // 결혼 초대곡 (Suno로 직접 만든 곡)
+  bgm: "audio/bgm.m4a?v=2", // 배경음악: Buantez du jour (곡을 바꾸면 v 숫자를 올려 캐시된 옛 곡이 안 나오게)
   bgmCredit: "", // 맨 아래 작게 표시할 곡 정보 (비우면 숨김)
 
   // Apps Script 웹앱 URL (README 참고) — 참석 여부(구글 시트)와 사진 올리기(구글 드라이브)에 같이 씀
