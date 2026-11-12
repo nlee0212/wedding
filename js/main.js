@@ -468,13 +468,12 @@
     var draw = function (lat, lng) {
       kmapEl.hidden = false;
       var pos = new km.LatLng(lat, lng);
-      var map = new km.Map(kmapEl, { center: pos, level: 3, draggable: false, scrollwheel: false, disableDoubleClickZoom: true });
+      var map = new km.Map(kmapEl, { center: pos, level: 3, scrollwheel: false }); // 끌기·두 손가락 확대 가능 (PC 마우스 휠은 페이지 스크롤용으로 끔)
+      map.addControl(new km.ZoomControl(), km.ControlPosition.RIGHT);
       new km.Marker({ position: pos, map: map });
       var lab = el("div", "kmap-label", v.name);
       new km.CustomOverlay({ position: pos, content: lab, yAnchor: 0.5, map: map });
       map.relayout(); map.setCenter(pos);
-      // 지도를 누르면 카카오맵 앱/웹으로
-      kmapEl.addEventListener("click", function () { $("#mapKakao").click(); });
     };
     if (hasXY) return draw(Number(v.lat), Number(v.lng));
     var places = new km.services.Places();
