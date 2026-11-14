@@ -163,16 +163,23 @@ button { font-family: inherit; color: inherit; }
 .pill.white { background: #fff; color: var(--ink); box-shadow: 0 2px 12px rgba(0, 0, 0, .12); border: 1px solid #eee; }
 
 /* 갤러리 */
-.chips { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 18px 0 18px; } /* GALLERY 글자와 간격 */
+.chips { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px; margin: 18px 0 16px; } /* GALLERY 글자와 간격 */
+.chip-item { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 52px; border: 0; background: none; padding: 0; cursor: pointer; }
 .chip {
   width: 46px; height: 46px; display: inline-flex; align-items: center; justify-content: center;
-  border: 1px solid var(--line-soft); background: #fff; border-radius: 50%; cursor: pointer; padding: 0;
+  border: 1px solid var(--line-soft); background: #fff; border-radius: 50%;
   transition: transform .2s, background .2s, box-shadow .2s;
 }
 .chip-emoji { font-size: 21px; line-height: 1; }
 .chip-all { font-family: var(--en); font-weight: 600; font-size: 14px; letter-spacing: .08em; color: var(--rose-deep); line-height: 1; }
-.chip:active { transform: scale(.92); }
-.chip[aria-pressed="true"] { background: var(--rose-soft); border: 1.5px solid var(--rose); box-shadow: 0 4px 10px rgba(var(--rose-rgb), .3); transform: translateY(-2px); }
+.chip-name { font-size: 11px; line-height: 1.2; color: var(--muted); white-space: nowrap; letter-spacing: -.02em; }
+.chip-item:active .chip { transform: scale(.92); }
+.chip-item[aria-pressed="true"] .chip { background: var(--rose-soft); border: 1.5px solid var(--rose); box-shadow: 0 4px 10px rgba(var(--rose-rgb), .3); transform: translateY(-2px); }
+.chip-item[aria-pressed="true"] .chip-name { color: var(--rose-deep); font-weight: 700; }
+/* 아직 안 눌러 본 하객에게 한 번: 차례로 통통 */
+.chips.nudge .chip-item:not([aria-pressed="true"]) .chip { animation: chipHop .5s ease calc(var(--i) * .12s) 2; }
+@keyframes chipHop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-7px); } 70% { transform: translateY(1px); } }
+@media (prefers-reduced-motion: reduce) { .chips.nudge .chip { animation: none; } }
 .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; margin: 0 -20px; }
 .gallery button { border: 0; padding: 0; background: #eee; cursor: zoom-in; }
 .gallery img { width: 100%; aspect-ratio: 1; object-fit: cover; } /* 썸네일은 얼굴 기준으로 미리 정사각형으로 잘라 둠 */

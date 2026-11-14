@@ -192,19 +192,33 @@
     var opts = themes.length > 1 ? [{ label: "ALL", name: "전체", photos: mixed }].concat(themes) : [{ name: "", photos: mixed }];
     if (themes.length > 1) {
       opts.forEach(function (t, i) {
-        var c = el("button", "chip");
+        // 인스타 하이라이트처럼: 동그라미(이모지) + 아래 작은 장소 이름 → 눌러서 장소별로 볼 수 있다는 게 보이게
+        var c = el("button", "chip-item");
         c.type = "button";
+        c.style.setProperty("--i", i);
         c.setAttribute("aria-pressed", String(i === 0));
-        // 화면에는 이모지만. 이름은 화면 읽기·길게 누르기 툴팁용으로만 둠
-        c.appendChild(t.label ? el("span", "chip-all", t.label) : el("span", "chip-emoji", t.emoji));
+        var circle = el("span", "chip");
+        circle.appendChild(t.label ? el("span", "chip-all", t.label) : el("span", "chip-emoji", t.emoji));
+        c.appendChild(circle);
+        c.appendChild(el("span", "chip-name", t.label ? "전체" : (t.short || t.name))); // short: 버튼 아래에 쓸 짧은 이름 (config.js)
         c.setAttribute("aria-label", t.name + " " + t.photos.length + "장");
-        c.title = t.name;
         c.addEventListener("click", function () {
-          $$(".chip").forEach(function (x) { x.setAttribute("aria-pressed", String(x === c)); });
+          store.set("chip-used", "1");
+          chips.classList.remove("nudge");
+          $$(".chip-item").forEach(function (x) { x.setAttribute("aria-pressed", String(x === c)); });
           renderGallery(t.photos);
         });
         chips.appendChild(c);
       });
+      // 장소 버튼을 아직 안 눌러 본 하객에게: 갤러리가 화면에 들어오면 동그라미들이 차례로 한 번 통통
+      if (!store.get("chip-used") && "IntersectionObserver" in window) {
+        var nio = new IntersectionObserver(function (es) {
+          if (!es[0].isIntersecting) return;
+          nio.disconnect();
+          setTimeout(function () { chips.classList.add("nudge"); }, 400);
+        }, { threshold: 0.6 });
+        nio.observe(chips);
+      }
     } else chips.hidden = true;
     renderGallery(mixed);
   }
