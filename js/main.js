@@ -343,26 +343,12 @@
     // '게시'를 눌러도 입력칸 포커스가 유지되게 (포커스가 버튼으로 가면 키보드가 닫히며 화면이 튐)
     send.addEventListener("mousedown", function (e) { e.preventDefault(); });
     send.addEventListener("touchstart", function (e) { if (document.activeElement === tx || document.activeElement === nm) { e.preventDefault(); form.requestSubmit ? form.requestSubmit() : send.click(); } }, { passive: false });
-    // 댓글을 다는 동안 입력칸이 '눈에 보이는 화면'의 같은 자리에 머물도록 피드 스크롤을 계속 맞춤
-    // (휴대폰 키보드가 닫히거나 브라우저가 스스로 스크롤해도, 댓글 목록이 길어져도 되돌려 놓음)
-    var vv = window.visualViewport;
-    var formTop = function () { return form.getBoundingClientRect().top - (vv ? vv.offsetTop : 0); };
-    var pinUntil = 0, pinTarget = 0, pinning = false;
-    var pin = function (ms) {
-      if (!pinning) pinTarget = formTop();
-      pinUntil = Math.max(pinUntil, Date.now() + ms);
-      if (pinning) return;
-      pinning = true;
-      (function step() {
-        var d = formTop() - pinTarget;
-        if (Math.abs(d) > 1) feedEl.scrollTop += d;
-        if (Date.now() < pinUntil) requestAnimationFrame(step); else pinning = false;
-      })();
-    };
+    // 댓글 목록이 바뀌어도 입력칸이 화면의 같은 자리에 있도록 한 번만 스크롤을 맞춤 (화면을 붙잡지 않음)
     var keepPlace = function (fn) {
       var before = form.getBoundingClientRect().top;
       fn();
-      feedEl.scrollTop += form.getBoundingClientRect().top - before;
+      var d = form.getBoundingClientRect().top - before;
+      if (Math.abs(d) > 1) window.scrollBy(0, d);
     };
     var sending = false;
     form.addEventListener("submit", function (e) {
@@ -374,7 +360,6 @@
       if (!W.appsScriptUrl) return toast("아직 서버가 연결되지 않았어요");
       store.set("cmt-name", name);
       sending = true;
-      pin(1500);
       // 바로 화면에 보여 주고(흐리게), 서버 저장이 끝나면 진하게
       var mine = { name: name, text: text, pending: true };
       var list = (feedData.comments[id] = feedData.comments[id] || []);
@@ -385,14 +370,12 @@
         .then(function (res) {
           var i = list.indexOf(mine);
           if (i >= 0) list[i] = res.item || { name: name, text: text };
-          pin(800);
           keepPlace(function () { updatePost(post); });
         })
         .catch(function () {
           var i = list.indexOf(mine);
           if (i >= 0) list.splice(i, 1);
           if (!tx.value) tx.value = text;
-          pin(800);
           keepPlace(function () { updatePost(post); updateBadges(); });
           toast("댓글을 남기지 못했어요");
         })
@@ -402,21 +385,29 @@
     updatePost(post);
     return post;
   }
+  // 피드는 페이지 위에 겹친 창이 아니라, 열려 있는 동안 '페이지 자체'가 됨 (본문은 숨김)
+  // → 아이폰 키보드 뒤로 갤러리가 비치지 않고, 카톡 브라우저 주소창이 나타나도 스크롤이 끊기지 않음
+  var pageY = 0;
   function openFeed(idx) {
     store.set("feed-seen", "1");
     feedList.innerHTML = "";
     curIds.forEach(function (id, i) { feedList.appendChild(buildPost(id, i, curIds.length)); });
+    if (!feedOpen) pageY = window.scrollY;
+    try { history.scrollRestoration = "manual"; } catch (e) {} // 뒤로가기 때 브라우저가 멋대로 스크롤 위치를 바꾸지 않게
     feedEl.hidden = false;
-    document.body.style.overflow = "hidden";
+    document.body.classList.add("feed-open");
     var target = feedList.children[idx];
-    feedEl.scrollTop = target ? target.offsetTop - $(".feed-bar").offsetHeight : 0;
+    window.scrollTo(0, target ? target.getBoundingClientRect().top + window.scrollY - $(".feed-bar").offsetHeight : 0);
     if (!feedOpen) { feedOpen = true; try { history.pushState({ feed: 1 }, ""); } catch (e) {} }
     loadFeed();
   }
   function closeFeed() {
     feedEl.hidden = true;
     feedOpen = false;
-    document.body.style.overflow = "";
+    document.body.classList.remove("feed-open");
+    window.scrollTo(0, pageY); // 갤러리 보던 자리로
+    requestAnimationFrame(function () { window.scrollTo(0, pageY); });
+    setTimeout(function () { window.scrollTo(0, pageY); }, 120);
     updateBadges();
     // 하트 기록이 서버에 저장될 시간을 조금 두고, 다른 하객 반응까지 포함한 최신 숫자로 갱신
     setTimeout(loadFeed, 1500);
