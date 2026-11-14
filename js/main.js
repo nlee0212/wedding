@@ -129,36 +129,6 @@
   tick();
   setInterval(tick, 1000);
 
-  var fmt = function (d) { return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); };
-  // 캘린더에 추가: 기본 캘린더(wedding.ics) / Google 캘린더 중 선택
-  // ※ 날짜·장소를 바꾸면 wedding.ics 파일도 같이 고쳐야 함
-  var gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-    "&text=" + encodeURIComponent(W.groom.name + " " + W.bride.name + " 결혼식") +
-    "&dates=" + fmt(wd) + "/" + fmt(new Date(wd.getTime() + 2 * 3600 * 1000)) +
-    "&location=" + encodeURIComponent(W.venue.name + " " + W.venue.hall + ", " + W.venue.address);
-  var isAndroidUA = /Android/i.test(navigator.userAgent), isIOSUA = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  var calBtn = $("#gcal");
-  calBtn.textContent = "＋ 내 캘린더에 추가";
-  calBtn.removeAttribute("target");
-  calBtn.href = "#";
-  // 아이폰·PC: 기본 캘린더(.ics) / Google 캘린더 선택 창, 안드로이드: Google 캘린더로 바로
-  var calModal = $("#calModal"), calIcs = $("#calIcs");
-  $("#calIcsName").textContent = isIOSUA ? "iPhone 캘린더" : isAndroidUA ? "휴대폰 캘린더" : "캘린더 앱";
-  $("#calIcsSub").textContent = isIOSUA ? "기본 캘린더 앱" : isAndroidUA ? "삼성 캘린더 등" : "Outlook · Apple 캘린더 등";
-  // 아이폰 사파리는 download 속성이 있으면 저장만 하므로, 아이폰에서는 바로 열리게
-  if (!isIOSUA) calIcs.setAttribute("download", "김용현이나연_결혼식.ics");
-  $("#calGoogle").href = gcalUrl;
-  var closeCal = function () { calModal.hidden = true; document.body.style.overflow = ""; };
-  if (isAndroidUA) {
-    // 안드로이드: 웹에서 휴대폰 캘린더를 바로 열 수 없어 파일 다운로드가 돼 버림 → 선택 창 없이 Google 캘린더로 바로
-    // (삼성 캘린더도 구글 계정과 연동돼 있으면 같이 보임)
-    calBtn.textContent = "＋ Google 캘린더에 추가";
-    calBtn.href = gcalUrl; calBtn.target = "_blank"; calBtn.rel = "noopener";
-  } else calBtn.addEventListener("click", function (e) { e.preventDefault(); calModal.hidden = false; document.body.style.overflow = "hidden"; });
-  calModal.querySelector("[data-close]").addEventListener("click", closeCal);
-  calModal.addEventListener("click", function (e) { if (e.target === calModal) closeCal(); });
-  [calIcs, $("#calGoogle")].forEach(function (x) { x.addEventListener("click", function () { setTimeout(closeCal, 300); }); });
-
   // ── 갤러리 + 라이트박스 ──
   var g = $("#gallery"), lb = $("#lightbox"), lbImg = lb.querySelector("img"), cur = 0;
   // ?v=4: 사진 파일을 같은 이름으로 바꿔 넣었을 때 휴대폰에 남은 예전 사진 대신 새 사진을 받게 함 (사진을 교체하면 숫자 올리기)
@@ -252,7 +222,7 @@
 
   function loadFeed() {
     if (!W.appsScriptUrl) return;
-    callScript({ type: "feed_get" }).then(function (res) {
+    callScript({ type: "feed_get", device: deviceId }).then(function (res) {
       // 구글 시트는 "01" 같은 사진 번호를 숫자 1로 바꿔 저장함 → "1"로 돌아온 키를 원래 ID("01")로 되돌림
       var byNum = {};
       themes.forEach(function (t) { t.photos.forEach(function (id) { if (/^\d+$/.test(id)) byNum[String(Number(id))] = id; }); });
@@ -298,6 +268,29 @@
       var li = el("li", c.pending ? "pending" : null);
       li.appendChild(el("b", null, c.name));
       li.append(" " + c.text);
+      // 이 기기에서 쓴 댓글에만 삭제 버튼 (서버가 mine:true 로 알려 줌)
+      if (c.mine && c.id && !c.pending) {
+        var del = el("button", "cmt-del", "삭제");
+        del.type = "button";
+        del.setAttribute("aria-label", "내 댓글 삭제");
+        del.addEventListener("click", function () {
+          if (!confirm("이 댓글을 삭제할까요?")) return;
+          del.disabled = true;
+          callScript({ type: "feed_comment_delete", id: c.id, device: deviceId })
+            .then(function () {
+              var i = list.indexOf(c);
+              if (i >= 0) list.splice(i, 1);
+              updatePost(post);
+              updateBadges();
+              toast("댓글이 삭제되었습니다");
+            })
+            .catch(function (er) {
+              del.disabled = false;
+              toast(/not_owner/.test(er && er.message) ? "이 기기에서 쓴 댓글만 지울 수 있어요" : "삭제하지 못했어요");
+            });
+        });
+        li.appendChild(del);
+      }
       ul.appendChild(li);
     });
   }
@@ -388,7 +381,7 @@
       list.push(mine);
       tx.value = "";
       keepPlace(function () { post.classList.add("all"); updatePost(post); updateBadges(); });
-      callScript({ type: "feed_comment", id: id, name: name, text: text })
+      callScript({ type: "feed_comment", id: id, name: name, text: text, device: deviceId })
         .then(function (res) {
           var i = list.indexOf(mine);
           if (i >= 0) list[i] = res.item || { name: name, text: text };
@@ -537,8 +530,6 @@
         }
       }
       new km.Marker({ position: pos, map: map });
-      var lab = el("div", "kmap-label", v.name);
-      new km.CustomOverlay({ position: pos, content: lab, yAnchor: 0.5, map: map });
       map.relayout(); map.setCenter(pos);
     };
     if (hasXY) return draw(Number(v.lat), Number(v.lng));
@@ -1016,18 +1007,39 @@
   snapModal.querySelector("[data-close]").addEventListener("click", closeSnap);
   snapModal.addEventListener("click", function (e) { if (e.target === snapModal) closeSnap(); });
 
+  // 비슷한 사진 비교용 '비교값': 64×64 로 줄인 뒤 4×4 칸 평균 밝기 → 16×16(256바이트) → base64
+  function lookSig(img) {
+    try {
+      var c = document.createElement("canvas"); c.width = c.height = 64;
+      var g = c.getContext("2d"); g.drawImage(img, 0, 0, 64, 64);
+      var px = g.getImageData(0, 0, 64, 64).data, s = "";
+      for (var by = 0; by < 16; by++) for (var bx = 0; bx < 16; bx++) {
+        var t = 0;
+        for (var y = by * 4; y < by * 4 + 4; y++) for (var x = bx * 4; x < bx * 4 + 4; x++) {
+          var i = (y * 64 + x) * 4; t += 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+        }
+        s += String.fromCharCode(Math.round(t / 16));
+      }
+      return btoa(s);
+    } catch (e) { return ""; }
+  }
+
   // 휴대폰 원본은 5~10MB 라 그대로 보내면 느리고 한도에 걸림 → 긴 변 2400px JPEG 로 줄여서 보냄
   function shrink(file) {
     return new Promise(function (resolve, reject) {
       var img = new Image();
       img.onload = function () {
         URL.revokeObjectURL(img.src);
-        var s = Math.min(1, MAX_EDGE / Math.max(img.naturalWidth, img.naturalHeight));
-        var c = document.createElement("canvas");
-        c.width = Math.round(img.naturalWidth * s);
-        c.height = Math.round(img.naturalHeight * s);
-        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-        resolve(c.toDataURL("image/jpeg", 0.88).split(",")[1]);
+        // 원본용(긴 변 2400px)과 사진 벽 공개용 썸네일(긴 변 600px)을 같이 만듦
+        var draw = function (edge, q) {
+          var s = Math.min(1, edge / Math.max(img.naturalWidth, img.naturalHeight));
+          var c = document.createElement("canvas");
+          c.width = Math.round(img.naturalWidth * s);
+          c.height = Math.round(img.naturalHeight * s);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          return c.toDataURL("image/jpeg", q).split(",")[1];
+        };
+        resolve({ data: draw(MAX_EDGE, 0.88), thumb: draw(600, 0.82), sig: lookSig(img) });
       };
       img.onerror = function () { reject(new Error("decode")); };
       img.src = URL.createObjectURL(file);
@@ -1052,13 +1064,14 @@
         renderSnaps();
         if (failed) snapErr.textContent = failed + "장을 올리지 못했어요. 다시 눌러 주세요.";
         else { closeSnap(); toast("사진 " + okCount + "장이 전달되었습니다. 감사합니다 ♥"); }
+        if (okCount) loadWall(); // 방금 올린 사진이 벽 맨 앞에 보이게
         return;
       }
       var p = queue[n];
       shrink(p.file)
-        .then(function (b64) {
-          return callScript({ type: "photo", uploader: uploader, filename: p.file.name, data: b64 })
-            .catch(function () { return callScript({ type: "photo", uploader: uploader, filename: p.file.name, data: b64 }); });
+        .then(function (img) {
+          var body = { type: "photo", uploader: uploader, filename: p.file.name, data: img.data, thumb: img.thumb, sig: img.sig };
+          return callScript(body).catch(function () { return callScript(body); });
         })
         .then(function () { p.state = "done"; okCount++; }, function () { p.state = "fail"; })
         .then(function () {
@@ -1070,6 +1083,128 @@
         });
     })();
   });
+
+  // ── 하객 사진 벽 (폴라로이드) ──
+  // 서버 photo_list(최신순, 숨김 제외)를 받아 최근 20장(5장×4줄)을 먼저, 나머지는 '펼쳐보기'로
+  var wall = $("#snapWall"), wallMore = $("#snapWallMore"), wallLess = $("#snapWallLess"), wallView = $("#wallView");
+  var WALL_FIRST = 20, wallItems = [], wallShown = WALL_FIRST, wallLoading = false;
+  function renderWall() {
+    wall.innerHTML = "";
+    wallItems.slice(0, wallShown).forEach(function (it, i) {
+      var b = el("button", "polaroid");
+      b.type = "button";
+      // 사진마다 살짝 다른 기울기 (id 로 정해서 새로고침해도 같은 모양)
+      var h = 0;
+      for (var k = 0; k < it.id.length; k++) h = (h * 31 + it.id.charCodeAt(k)) % 997;
+      b.style.setProperty("--tilt", ((h % 5) - 2) * 0.5 + "deg"); // -1° ~ 1°
+      var im = el("img");
+      im.src = it.thumb; im.loading = i < 6 ? "eager" : "lazy"; im.alt = (it.name || "하객") + "님이 올린 사진";
+      im.referrerPolicy = "no-referrer";
+      im.addEventListener("error", function () { b.hidden = true; }); // 깨진 썸네일은 숨김
+      b.appendChild(im);
+      var label = ""; // 이름은 표시하지 않음 (아래 여백만)
+      b.appendChild(el("span", "polaroid-name", label));
+      b.addEventListener("click", function () {
+        wallView.querySelector("img").src = it.thumb;
+        wallView.querySelector(".polaroid-name").textContent = label;
+        wallView.hidden = false;
+        document.body.style.overflow = "hidden";
+      });
+      wall.appendChild(b);
+    });
+    // 펼쳐보기: 누를 때마다 4줄(20장)씩, 버튼엔 이번에 새로 보일 장수. 한 번이라도 펼치면 옆에 '접기'
+    var left = wallItems.length - wallShown;
+    wallMore.hidden = left <= 0;
+    wallMore.textContent = "⌄ 펼쳐보기 (" + Math.min(WALL_FIRST, left) + "장 더)";
+    wallLess.hidden = wallShown <= WALL_FIRST || wallItems.length <= WALL_FIRST;
+  }
+  // 사진 고르기: 올린 사람마다 최소 1장은 꼭 보이게 하고, 남은 자리는 전체 사진에서 랜덤.
+  // (이름 없이 올린 사진은 '이름 없음' 한 사람으로 묶음) 처음 보이는 칸 안에서는 다시 섞어서,
+  // 두 사람이 비슷하게 올렸으면 거의 반반씩 섞여 나옴. 들어올 때마다 바뀜
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  // 라운드 로빈 + 최신성 우선:
+  //  - 1바퀴: 모든 사람 1장씩 → 2바퀴: 각자 2번째 … (두 사람이 비슷하게 올리면 정확히 반반)
+  //  - 각 사람 사진은 최근에 올린 것부터
+  //  - 한 바퀴 안에서는 가장 최근에 올린 사람부터 (사람이 칸보다 많으면 최근 사람이 먼저 자리를 받음)
+  //  - 화면에선 페이지(20장)마다 섞어서 같은 사람 사진이 줄지어 붙지 않게
+  function spreadByUploader(items) {
+    var groups = {}, keys = [];
+    items.forEach(function (it) {
+      var k = (it.name || "").trim(); // "" = 이름 없음 (한 사람으로)
+      if (!groups[k]) { groups[k] = []; keys.push(k); }
+      groups[k].push(it);
+    });
+    keys.forEach(function (k) { groups[k].sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }); });
+    keys.sort(function (a, b) { return (groups[b][0].ts || 0) - (groups[a][0].ts || 0); });
+    var seq = [];
+    for (var round = 0, more = true; more; round++) {
+      more = false;
+      keys.forEach(function (k) { if (groups[k][round]) { seq.push(groups[k][round]); more = true; } });
+    }
+    var out = [];
+    for (var i = 0; i < seq.length; i += WALL_FIRST) out = out.concat(shuffle(seq.slice(i, i + WALL_FIRST)));
+    return out;
+  }
+  // 거의 같은 사진(연사 등)은 한 장만: 같은 사람이 10분 안에 올린 사진끼리만 비교해서
+  // (다른 하객이 같은 장면을 찍은 사진은 그대로 둠) 최근 것을 남기고 닮은 것은 뺌.
+  // 닮음 = 16×16 밝기의 상관계수(위아래·좌우 2칸까지 어긋남 허용) 0.80 이상. 비교값 없는 사진은 그대로.
+  var LOOKALIKE = 0.8, SAME_BATCH_MS = 10 * 60 * 1000;
+  function sigBytes(b64) {
+    try { var s = atob(b64); if (s.length !== 256) return null; var a = new Array(256); for (var i = 0; i < 256; i++) a[i] = s.charCodeAt(i); return a; } catch (e) { return null; }
+  }
+  function lookAlike(a, b) {
+    var best = -1;
+    for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) {
+      var n = 0, sa = 0, sb = 0, saa = 0, sbb = 0, sab = 0;
+      for (var y = Math.max(0, -dy); y < Math.min(16, 16 - dy); y++) for (var x = Math.max(0, -dx); x < Math.min(16, 16 - dx); x++) {
+        var p = a[y * 16 + x], q = b[(y + dy) * 16 + x + dx];
+        n++; sa += p; sb += q; saa += p * p; sbb += q * q; sab += p * q;
+      }
+      var va = saa - sa * sa / n, vb = sbb - sb * sb / n;
+      var r = (sab - sa * sb / n) / Math.sqrt(va * vb + 1e-9);
+      if (r > best) best = r;
+    }
+    return best >= LOOKALIKE;
+  }
+  function dropLookalikes(items) {
+    var kept = [];
+    items.slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).forEach(function (it) {
+      var sg = it.sig ? sigBytes(it.sig) : null;
+      var who = (it.name || "").trim();
+      var dup = sg && kept.some(function (k) {
+        return k.sg && k.who === who && Math.abs((k.it.ts || 0) - (it.ts || 0)) <= SAME_BATCH_MS && lookAlike(sg, k.sg);
+      });
+      if (!dup) kept.push({ it: it, sg: sg, who: who });
+    });
+    return kept.map(function (k) { return k.it; });
+  }
+  function loadWall() {
+    if (!W.appsScriptUrl || wallLoading) return;
+    wallLoading = true;
+    callScript({ type: "photo_list" })
+      .then(function (res) { wallItems = spreadByUploader(dropLookalikes(res.items || [])); renderWall(); })
+      .catch(function () {})
+      .finally(function () { wallLoading = false; });
+  }
+  wallMore.addEventListener("click", function () {
+    wallShown = Math.min(wallItems.length, wallShown + WALL_FIRST);
+    renderWall();
+  });
+  wallLess.addEventListener("click", function () {
+    wallShown = WALL_FIRST;
+    renderWall();
+    $("#snapSec").scrollIntoView({ behavior: "smooth" });
+  });
+  var closeWallView = function () { wallView.hidden = true; document.body.style.overflow = ""; };
+  wallView.querySelector(".lb-close").addEventListener("click", closeWallView);
+  wallView.addEventListener("click", function (e) { if (e.target === wallView) closeWallView(); });
+  if (W.photoUpload && "IntersectionObserver" in window) {
+    var wio = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { loadWall(); wio.disconnect(); } }, { rootMargin: "500px" });
+    wio.observe($("#snapSec"));
+  } else if (W.photoUpload) loadWall();
 
   // ── 방명록 (말풍선, 구글 시트 '방명록' 탭) ──
   if (W.appsScriptUrl && W.guestbook !== false) {

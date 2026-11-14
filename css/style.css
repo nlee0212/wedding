@@ -148,7 +148,7 @@ button { font-family: inherit; color: inherit; }
 .countdown small { font-size: 10px; letter-spacing: .08em; color: var(--muted); }
 .countdown b { font-size: 26px; font-weight: 700; line-height: 1.3; font-variant-numeric: tabular-nums; }
 .countdown > span { font-size: 22px; line-height: 1.6; }
-.dday-text { margin: 16px 0 26px; font-size: 14px; }
+.dday-text { margin: 16px 0 0; font-size: 14px; }
 .dday-text em { font-style: normal; color: var(--pink); }
 
 /* 버튼 */
@@ -158,7 +158,6 @@ button { font-family: inherit; color: inherit; }
   text-decoration: none; cursor: pointer; border: 0; transition: transform .15s, box-shadow .2s;
 }
 .pill:active { transform: scale(.97); }
-.pill.grad { color: #fff; background: linear-gradient(90deg, var(--grad1), var(--rose) 55%, var(--grad2)); box-shadow: 0 8px 20px rgba(var(--rose-rgb), .35); }
 .pill.outline { background: #fff; color: var(--rose); border: 1.5px solid var(--rose); padding: 9px 40px; margin-top: 22px; font-size: 14px; }
 .pill.solid { background: var(--rose); color: #fff; box-shadow: 0 6px 16px rgba(var(--rose-rgb), .3); }
 .pill.white { background: #fff; color: var(--ink); box-shadow: 0 2px 12px rgba(0, 0, 0, .12); border: 1px solid #eee; }
@@ -218,7 +217,6 @@ button { font-family: inherit; color: inherit; }
 .kmap-lock[hidden] { display: none; }
 .kmap-tip { position: absolute; z-index: 20; left: 50%; bottom: 12px; transform: translateX(-50%); background: rgba(40, 40, 40, .7); color: #fff; font-size: 12px; padding: 5px 12px; border-radius: 999px; white-space: nowrap; opacity: 0; transition: opacity .3s; pointer-events: none; }
 .kmap-tip.show { opacity: 1; }
-.kmap-label { background: #fff; border: 1px solid rgba(var(--rose-rgb), .5); border-radius: 999px; padding: 4px 11px; font-size: 12px; font-weight: 700; color: var(--ink); box-shadow: 0 2px 8px rgba(0, 0, 0, .12); white-space: nowrap; transform: translateY(-46px); }
 .way-card { background: #fff; border-radius: 16px; box-shadow: var(--card-shadow); border: 1px solid #f1f1f1; overflow: hidden; text-align: left; }
 .way-rows { padding: 6px 18px; }
 .way-row { display: grid; grid-template-columns: 74px 1fr; gap: 8px; padding: 16px 0; }
@@ -387,15 +385,7 @@ button { font-family: inherit; color: inherit; }
 .save-img { display: block; width: auto; max-width: 100%; max-height: 52svh; margin: 0 auto; border-radius: 10px; box-shadow: var(--card-shadow); -webkit-touch-callout: default; }
 .save-btn { display: inline-block; margin-top: 18px; text-decoration: none; padding: 11px 44px; }
 .save-hint { font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.6; }
-.cal-pick { padding: 30px 20px 20px; }
 .cal-title { color: var(--rose); letter-spacing: .06em; margin: 4px 0 20px; }
-.cal-opt { display: flex; align-items: center; gap: 14px; padding: 13px 18px; margin-top: 10px; border-radius: 14px; background: #fff; border: 1px solid var(--line-soft); box-shadow: var(--card-shadow); text-decoration: none; text-align: left; transition: background .2s; }
-.cal-opt:active { background: var(--rose-softer); }
-.cal-opt::after { content: ""; margin-left: auto; width: 7px; height: 7px; border-right: 1.5px solid var(--rose); border-top: 1.5px solid var(--rose); transform: rotate(45deg); }
-.cal-ic { width: 34px; height: 34px; border-radius: 9px; flex: none; display: flex; align-items: center; justify-content: center; background: var(--rose-soft); box-shadow: 0 0 0 1px rgba(0,0,0,.05); }
-.cal-ic svg { width: 20px; height: 20px; fill: none; stroke: var(--rose-deep); stroke-width: 1.7; stroke-linecap: round; }
-.cal-name { font-size: 15px; color: var(--ink); line-height: 1.35; }
-.cal-name small { display: block; font-size: 12px; color: var(--muted); }
 .modal-later { border: 0; background: none; font-size: 12.5px; color: var(--muted); text-decoration: underline; margin-top: 12px; cursor: pointer; }
 
 /* 사진 올리기 */
@@ -485,3 +475,38 @@ button { font-family: inherit; color: inherit; }
 .info-preview img { width: 150px; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 10px; box-shadow: 0 6px 18px rgba(0, 0, 0, .12); border: 1px solid var(--line-soft); transition: transform .2s; }
 .info-preview:active img { transform: scale(.97); }
 .info-preview span { font-size: 11.5px; color: var(--muted); }
+
+/* 하객 사진 벽 (폴라로이드) */
+/* 폴라로이드: 보내 주신 이미지 비율 그대로
+   카드 2:3, 사진 칸 3:4, 위·양옆 테두리 = 카드 너비의 6%, 아래 여백 = 카드 너비의 28%, 모서리에 마스킹 테이프 */
+.wall { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px 10px; margin-top: 24px; padding: 6px 6px 0; } /* 한 줄에 5장 × 4줄 = 처음 20장 */
+.wall:empty { display: none; }
+.polaroid {
+  position: relative; border: 0; background: #fff; padding: 6% 6% 0; cursor: pointer;
+  display: flex; flex-direction: column; transform: rotate(var(--tilt, 0deg)); transition: transform .2s;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .1), 0 2px 5px rgba(0, 0, 0, .07);
+}
+.polaroid:active { transform: rotate(0deg) scale(.96); }
+.polaroid img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #ece7df; } /* 불러오는 동안 연한 베이지 */
+/* 아래 여백: 사진 칸 너비(카드의 88%) 기준 28/88 → 가로:세로 = 88:28 */
+.polaroid-name { width: 100%; aspect-ratio: 88 / 28; display: flex; align-items: center; justify-content: center; font-family: var(--sans); font-size: 10.5px; letter-spacing: .02em; color: #3a3a3a; overflow: hidden; white-space: nowrap; } /* 이름: 청첩장 본문 글씨체(을유1945) */
+/* 마스킹 테이프: 위쪽 가운데 한 장 (길이 = 카드 너비의 40%, 두께 = 길이의 1/4, 반쯤 카드 밖으로) */
+.polaroid::before {
+  content: ""; position: absolute; top: 0; left: 50%; width: 40%; aspect-ratio: 4 / 1; pointer-events: none;
+  transform: translate(-50%, -55%) rotate(-2deg);
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,.18) 0 2px, rgba(0,0,0,.02) 2px 4px), rgba(226, 226, 222, .82);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .06);
+}
+.wall-btns { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.wall-btns .pill.outline { margin-top: 0; padding: 9px 22px; }
+.wall-view { position: fixed; inset: 0; z-index: 70; background: rgba(0, 0, 0, .88); display: flex; align-items: center; justify-content: center; padding: 20px; }
+/* 크게 보기: 벽의 폴라로이드와 같은 비율·테이프, 화면에 맞는 크기로 */
+.polaroid-big { --w: min(74vw, 330px, calc((100svh - 140px) * 2 / 3)); width: var(--w); padding: calc(var(--w) * .06) calc(var(--w) * .06) 0; transform: none; cursor: default; box-shadow: 0 6px 24px rgba(0, 0, 0, .35); }
+.polaroid-big:active { transform: none; }
+.polaroid-big .polaroid-name { font-size: 17px; }
+.wall-view .lb-close { position: absolute; top: 12px; right: 8px; background: none; border: 0; color: #fff; font-size: 38px; cursor: pointer; }
+.cmt-del { border: 0; background: none; color: var(--muted); font-family: var(--sans); font-size: 11.5px; margin-left: 6px; padding: 0 2px; cursor: pointer; text-decoration: underline; }
+.cmt-del:disabled { opacity: .5; }
+.snap-behind { margin-top: 22px; font-size: 13px; line-height: 1.8; color: var(--rose-deep); }
+.snap-behind:empty { display: none; }
+.desc-sub { display: inline-block; margin-top: 6px; font-size: 12.5px; color: var(--muted); }

@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Parisienne&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=20261112zx" />
+  <link rel="stylesheet" href="css/style.css?v=20261113y" />
 </head>
 <body>
 <main class="page">
@@ -44,8 +44,8 @@
     <h2 class="spaced">INVITATION</h2>
     <div class="greeting" id="greeting"></div>
     <div class="parents">
-      <p><span data-f="groom.father"></span><b>•</b><span data-f="groom.mother"></span><em>의 <span data-f="groom.relation"></span></em><strong data-f="groom.first"></strong></p>
-      <p><span data-f="bride.father"></span><b>•</b><span data-f="bride.mother"></span><em>의 <span data-f="bride.relation"></span></em><strong data-f="bride.first"></strong></p>
+      <p><span data-f="groom.father"></span><b>•</b><span data-f="groom.mother"></span><em>의 <span data-f="groom.relation"></span></em><strong data-f="groom.name"></strong></p>
+      <p><span data-f="bride.father"></span><b>•</b><span data-f="bride.mother"></span><em>의 <span data-f="bride.relation"></span></em><strong data-f="bride.name"></strong></p>
     </div>
   </section>
 
@@ -61,7 +61,6 @@
       <div><small>SEC</small><b id="cdS">0</b></div>
     </div>
     <p class="dday-text" id="ddayText"></p>
-    <a class="pill grad" id="gcal" target="_blank" rel="noopener">＋ Google Calendar에 추가</a>
   </section>
 
   <!-- 갤러리 -->
@@ -144,10 +143,16 @@
   <section class="sec reveal" id="snapSec" hidden>
     <p class="eyebrow">CAPTURE OUR MOMENTS</p>
     <h2 class="title">Snaps</h2>
-    <p class="desc dark">신랑신부의 행복한 순간을 담아 주세요.<br />아래 버튼으로 사진을 올리실 수 있어요.<br />많은 참여 부탁드려요!</p>
+    <p class="desc dark">오늘 찍어 주신 저희 모습을<br />사진으로 나눠 주세요.<br /><span class="desc-sub">올려 주신 사진은 아래 폴라로이드에 함께 걸려요.</span></p>
     <button class="pill white" id="snapBtn" type="button">사진 올리기</button>
     <input type="file" id="snapInput" accept="image/*" multiple hidden />
-    <p class="desc small">오늘 찍어 주신 신랑 신부의 모습을<br />여기서 바로 공유하실 수 있습니다!</p>
+    <p class="snap-behind">📸 웨딩 촬영 비하인드도 같이 넣어 두었으니<br />구경하고 가세요!</p>
+    <!-- 하객 사진 벽 (폴라로이드): 처음 20장(5장×4줄) + 펼쳐보기 -->
+    <div class="wall" id="snapWall" aria-label="하객들이 올린 사진"></div>
+    <div class="wall-btns">
+      <button class="pill outline" id="snapWallMore" type="button" hidden></button>
+      <button class="pill outline" id="snapWallLess" type="button" hidden>⌃ 접기</button>
+    </div>
   </section>
 
   <!-- 마무리 -->
@@ -191,21 +196,6 @@
     <img class="save-img" id="saveImg" alt="예식 정보 이미지">
     <a class="pill solid save-btn" id="saveBtn">갤러리에 저장</a>
     <p class="save-hint">저장이 안 되면 사진을 <b>길게 눌러</b> '이미지 저장'을 선택해 주세요</p>
-  </div>
-</div>
-<div class="modal" id="calModal" hidden>
-  <div class="modal-card cal-pick" role="dialog" aria-modal="true" aria-labelledby="calTitle">
-    <button class="modal-x" type="button" data-close aria-label="닫기">×</button>
-    <p class="eyebrow">CALENDAR</p>
-    <h3 class="cal-title" id="calTitle">캘린더 선택</h3>
-    <a class="cal-opt" id="calIcs" href="wedding.ics">
-      <span class="cal-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
-      <span class="cal-name"><span id="calIcsName">휴대폰 캘린더</span><small id="calIcsSub"></small></span>
-    </a>
-    <a class="cal-opt" id="calGoogle" target="_blank" rel="noopener">
-      <img class="cal-ic" src="images/icons/gcal.png" alt="" width="34" height="34">
-      <span class="cal-name">Google 캘린더<small>구글 계정 캘린더</small></span>
-    </a>
   </div>
 </div>
 <div class="modal" id="rsvpModal" hidden>
@@ -276,6 +266,13 @@
   <div id="feedList"></div>
 </div>
 
+<!-- 하객 사진 크게 보기 -->
+<div class="wall-view" id="wallView" hidden>
+  <button class="lb-close" type="button" aria-label="닫기">×</button>
+  <!-- 벽에 붙은 폴라로이드와 같은 모양을 크게 -->
+  <div class="polaroid polaroid-big"><img alt="" /><span class="polaroid-name"></span></div>
+</div>
+
 <div class="lightbox" id="lightbox" hidden>
   <button class="lb-close" type="button" aria-label="닫기">×</button>
   <button class="lb-prev" type="button" aria-label="이전">‹</button>
@@ -285,7 +282,7 @@
 </div>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="js/config.js?v=20261112zx"></script>
-<script src="js/main.js?v=20261112zx"></script>
+<script src="js/config.js?v=20261113y"></script>
+<script src="js/main.js?v=20261113y"></script>
 </body>
 </html>
