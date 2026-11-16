@@ -480,10 +480,20 @@ body.feed-open > main.page, body.feed-open .bgm-btn, body.feed-open .bgm-hint, b
 .thumb-badge { position: absolute; left: 5px; bottom: 5px; padding: 2px 7px; border-radius: 999px; background: rgba(0, 0, 0, .45); color: #fff; font-size: 10.5px; line-height: 1.6; pointer-events: none; white-space: pre; }
 
 /* 예식 정보 이미지 미리보기 */
-.info-preview { margin-top: 18px; border: 0; background: none; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.info-preview img { width: 150px; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 10px; box-shadow: 0 6px 18px rgba(0, 0, 0, .12); border: 1px solid var(--line-soft); transition: transform .2s; }
+.info-preview { margin-top: 18px; border: 0; background: none; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.info-thumb { position: relative; display: block; }
+.info-preview img { display: block; width: 150px; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 10px; box-shadow: 0 6px 18px rgba(0, 0, 0, .12); border: 1px solid var(--line-soft); transition: transform .2s; }
 .info-preview:active img { transform: scale(.97); }
-.info-preview span { font-size: 11.5px; color: var(--muted); }
+/* 눌러서 저장할 수 있다는 표시: 사진 오른쪽 아래 저장(↓) 동그라미 */
+.info-badge { position: absolute; right: -16px; bottom: -14px; width: 36px; height: 36px; border-radius: 50%; background: var(--rose); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(var(--rose-rgb), .45); }
+.info-badge svg { width: 19px; height: 19px; }
+.info-cap { font-size: 12.5px; color: var(--rose-deep); font-weight: 700; letter-spacing: -.01em; }
+/* 아직 저장해 보지 않은 하객에게: 화면에 들어오면 사진이 살짝 흔들리고 저장 표시가 두근 */
+.info-preview.nudge img { animation: infoWiggle 1.2s ease .2s 2; }
+.info-preview.nudge .info-badge { animation: badgePulse 1.2s ease .2s 3; }
+@keyframes infoWiggle { 0%, 60%, 100% { transform: rotate(0); } 15% { transform: rotate(-3deg); } 30% { transform: rotate(2.5deg); } 45% { transform: rotate(-1.5deg); } }
+@keyframes badgePulse { 0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(var(--rose-rgb), .45); } 30% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(var(--rose-rgb), .18); } }
+@media (prefers-reduced-motion: reduce) { .info-preview.nudge img, .info-preview.nudge .info-badge { animation: none; } }
 
 /* 하객 사진 벽 (폴라로이드) */
 /* 폴라로이드: 보내 주신 이미지 비율 그대로
