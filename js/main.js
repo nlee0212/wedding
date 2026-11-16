@@ -358,6 +358,22 @@
     send.addEventListener("mousedown", function (e) { e.preventDefault(); });
     send.addEventListener("touchstart", function (e) { if (document.activeElement === tx || document.activeElement === nm) { e.preventDefault(); form.requestSubmit ? form.requestSubmit() : send.click(); } }, { passive: false });
     // 댓글 목록이 바뀌어도 입력칸이 화면의 같은 자리에 있도록 한 번만 스크롤을 맞춤 (화면을 붙잡지 않음)
+    // 키보드를 올렸다 내리면 휴대폰이 화면을 엉뚱한 곳으로 옮겨 둠 → 키보드가 내려가면
+    // 입력칸을 누르기 전 화면에 있던 자리로 되돌림 (댓글이 늘어 목록이 길어져도 입력칸 기준)
+    var focusTop = null, blurTimer = null;
+    form.addEventListener("focusin", function () {
+      clearTimeout(blurTimer);
+      if (focusTop === null) focusTop = form.getBoundingClientRect().top;
+    });
+    form.addEventListener("focusout", function () {
+      clearTimeout(blurTimer);
+      blurTimer = setTimeout(function () {
+        if (form.contains(document.activeElement) || focusTop === null) return; // 이름 ↔ 댓글 칸 이동은 무시
+        var d = form.getBoundingClientRect().top - focusTop;
+        focusTop = null;
+        if (Math.abs(d) > 2) window.scrollBy(0, d);
+      }, 350); // 키보드가 다 내려간 뒤
+    });
     var keepPlace = function (fn) {
       var before = form.getBoundingClientRect().top;
       fn();
