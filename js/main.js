@@ -772,7 +772,16 @@
     }, { rootMargin: "400px" });
     pio.observe(pv.parentNode);
   }
-  pv.addEventListener("click", function () { $("#shareImage").click(); });
+  pv.addEventListener("click", function () { store.set("info-saved", "1"); pv.classList.remove("nudge"); $("#shareImage").click(); });
+  // 아직 눌러 보지 않은 하객에게: 미리보기가 화면에 들어오면 한 번 흔들어서 눌러 볼 수 있다는 걸 알림
+  if (!store.get("info-saved") && "IntersectionObserver" in window) {
+    var nudgeIo = new IntersectionObserver(function (es) {
+      if (!es[0].isIntersecting || pv.hidden) return;
+      nudgeIo.disconnect();
+      pv.classList.add("nudge");
+    }, { threshold: 0.7 });
+    var waitPv = setInterval(function () { if (!pv.hidden) { clearInterval(waitPv); nudgeIo.observe(pv); } }, 300);
+  }
 
   var saveModal = $("#saveModal");
   var closeSave = function () { saveModal.hidden = true; document.body.style.overflow = ""; };
@@ -780,6 +789,7 @@
   saveModal.addEventListener("click", function (e) { if (e.target === saveModal) closeSave(); });
   $("#saveBtn").addEventListener("click", function () { setTimeout(function () { toast("갤러리의 'Download' 앨범에 저장됐어요"); }, 400); });
   $("#shareImage").addEventListener("click", function () {
+    store.set("info-saved", "1");
     var btn = this;
     btn.disabled = true;
     getInfoImage().then(function (blob) {
