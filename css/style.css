@@ -176,9 +176,9 @@ button { font-family: inherit; color: inherit; }
 .chip-item:active .chip { transform: scale(.92); }
 .chip-item[aria-pressed="true"] .chip { background: var(--rose-soft); border: 1.5px solid var(--rose); box-shadow: 0 4px 10px rgba(var(--rose-rgb), .3); transform: translateY(-2px); }
 .chip-item[aria-pressed="true"] .chip-name { color: var(--rose-deep); font-weight: 700; }
-/* 아직 안 눌러 본 하객에게 한 번: 차례로 통통 */
-.chips.nudge .chip-item:not([aria-pressed="true"]) .chip { animation: chipHop .5s ease calc(var(--i) * .12s) 2; }
-@keyframes chipHop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-7px); } 70% { transform: translateY(1px); } }
+/* 아직 안 눌러 본 하객에게: 누를 때까지 차례로 통통 */
+.chips.nudge .chip-item:not([aria-pressed="true"]) .chip { animation: chipHop 3s ease calc(var(--i) * .12s) infinite; } /* 누를 때까지 3초마다 */
+@keyframes chipHop { 0%, 18%, 100% { transform: translateY(0); } 7% { transform: translateY(-7px); } 12% { transform: translateY(1px); } }
 @media (prefers-reduced-motion: reduce) { .chips.nudge .chip { animation: none; } }
 .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; margin: 0 -20px; }
 .gallery button { border: 0; padding: 0; background: #eee; cursor: zoom-in; }
@@ -488,10 +488,10 @@ body.feed-open > main.page, body.feed-open .bgm-btn, body.feed-open .bgm-hint, b
 .info-badge { position: absolute; right: -16px; bottom: -14px; width: 36px; height: 36px; border-radius: 50%; background: var(--rose); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(var(--rose-rgb), .45); }
 .info-badge svg { width: 19px; height: 19px; }
 .info-cap { font-size: 12.5px; color: var(--rose-deep); font-weight: 700; letter-spacing: -.01em; }
-/* 아직 저장해 보지 않은 하객에게: 화면에 들어오면 사진이 살짝 흔들리고 저장 표시가 두근 */
-.info-preview.nudge img { animation: infoWiggle 1.2s ease .2s 2; }
-.info-preview.nudge .info-badge { animation: badgePulse 1.2s ease .2s 3; }
-@keyframes infoWiggle { 0%, 60%, 100% { transform: rotate(0); } 15% { transform: rotate(-3deg); } 30% { transform: rotate(2.5deg); } 45% { transform: rotate(-1.5deg); } }
+/* 아직 저장해 보지 않은 하객에게: 누를 때까지 사진이 살짝 흔들리고 저장 표시가 두근 */
+.info-preview.nudge img { animation: infoWiggle 3.5s ease .2s infinite; } /* 누를 때까지 3.5초마다 */
+.info-preview.nudge .info-badge { animation: badgePulse 1.75s ease .2s infinite; }
+@keyframes infoWiggle { 0%, 28%, 100% { transform: rotate(0); } 7% { transform: rotate(-3deg); } 14% { transform: rotate(2.5deg); } 21% { transform: rotate(-1.5deg); } }
 @keyframes badgePulse { 0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(var(--rose-rgb), .45); } 30% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(var(--rose-rgb), .18); } }
 @media (prefers-reduced-motion: reduce) { .info-preview.nudge img, .info-preview.nudge .info-badge { animation: none; } }
 
